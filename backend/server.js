@@ -1,17 +1,19 @@
-const express =require('express');
-const app=express();
+import express from "express";
+import connectdb from "./src/config/db.js";
+import authRoutes from "./src/routes/authRoutes.js";
+const app = express();
 
-app.get("/",(req,res)=>{
-  res.send("First")
-})
+connectdb();
+// body parser
+app.use(express.json());
 
-// feature
-app.get("/feature",(req,res)=>{
-  res.send("second")
-})
+// routes
+app.use("/api/auth/", authRoutes);
 
+app.get("/", (req, res) => {
+  res.send("First");
+});
 
-app.listen(4000,()=>{
-  console.log("app running at port : ", 4000)
-
-})
+app.listen(4000, () => {
+  console.log("app running at port : ", 4000);
+});
