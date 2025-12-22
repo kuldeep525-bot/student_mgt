@@ -1,14 +1,12 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import cookie from "cookie";
 const SecretKey = "studentMangement@_525";
 
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     //validation
-
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -85,7 +83,6 @@ export const login = async (req, res) => {
     res.cookie("jwt", token, cookiesOption);
 
     //success response
-
     res.status(200).json({
       message: "User login Successfully",
       token: token,
