@@ -1,4 +1,4 @@
-import User from "../models/userModel.js";
+import User from "../models/user.Model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 const SecretKey = "studentMangement@_525";
