@@ -54,15 +54,29 @@ export const GetNOTES = async (req, res) => {
 
 export const GetAllNOTES = async (req, res) => {
   try {
+    //login userId
     const userId = req.userId;
-    console.log(userId);
-    const note = await Notes.find({ UserNote: userId });
-    console.log(note);
+    //pagination query parms(default value)
+    let page = Number(req.query.page) || 1; //url se jo bhi data ata hai voh sirf string ata hai toh huma conver karna page ise Number me
+    let limit = Number(req.query.limit) || 10;
 
-    if (!note) {
-      return res.status(404).json({ message: "Notes Not found" });
-    }
+    //saftey checks
 
+    if (page < 1) page = 1;
+    if (limit < 1) limit = 10;
+    if (limit > 20) limit = 20;
+
+    //skip calcultion
+    const skip = (page - 1) * limit;
+    const totalNotes = await Notes.countDocuments({
+      UserNote: userId,
+    });
+    const note = await Notes.find({ UserNote: userId })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // latest first;
+
+    const totalPages = Math.ceil(totalNotes / limit);
     if (note.length == 0) {
       return res.status(200).json({
         message: "No Notes Found",
@@ -70,7 +84,13 @@ export const GetAllNOTES = async (req, res) => {
       });
     }
 
-    res.status(200).json({ message: "Notes found successfully", note });
+    res.status(200).json({
+      message: "Notes found successfully",
+      currentPage: page,
+      totalPages: totalPages,
+      totalNotes: totalNotes,
+      notes: note,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
@@ -95,13 +115,10 @@ export const DeleteNotes = async (req, res) => {
     }
 
     //sirif owner he delete kar sakhte hai
-
     if (SoftDelNotes.UserNote.toString() !== userId) {
       return res.status(400).json({ message: "Acess Denied" });
     }
-
     await Notes.findByIdAndDelete(noteId);
-
     res.status(200).json({
       message: "Note deleted successfully",
     });
