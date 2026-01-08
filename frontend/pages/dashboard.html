@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Student Management</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+  <div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h2>StudentMS</h2>
+
+      <nav class="nav">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Students</a>
+        <a href="/pages/Notes.html">Notes</a>
+        <a href="#">Profile</a>
+        <a href="#">Logout</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <h1>Dashboard</h1>
+        <div class="user-box">Hello, Admin</div>
+      </header>
+
+      <!-- CONTENT -->
+      <section class="content">
+
+        <!-- STATS -->
+        <div class="stats">
+          <div class="stat-card">
+            <h3>Total Students</h3>
+            <p>120</p>
+          </div>
+
+          <div class="stat-card">
+            <h3>Total Notes</h3>
+            <p>45</p>
+          </div>
+
+          <div class="stat-card">
+            <h3>Active Users</h3>
+            <p>30</p>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-card">
+          <h2>Recent Students</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Rohan Sharma</td>
+                <td>rohan@gmail.com</td>
+                <td><span class="badge badge-success">Active</span></td>
+                <td>
+                  <div class="table-actions">
+                    <button class="action-btn action-edit">Edit</button>
+                    <button class="action-btn action-delete">Delete</button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td>Anjali Verma</td>
+                <td>anjali@gmail.com</td>
+                <td><span class="badge badge-warning">Pending</span></td>
+                <td>
+                  <div class="table-actions">
+                    <button class="action-btn action-edit">Edit</button>
+                    <button class="action-btn action-delete">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+
+        </div>
+
+      </section>
+
+    </div>
+  </div>
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+
+      <div class="modal-header">
+        <h2>Add Student</h2>
+        <span class="close-btn">&times;</span>
+      </div>
+
+      <form>
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" placeholder="Student name">
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="Student email">
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <input type="text" placeholder="Active / Pending">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline">Cancel</button>
+          <button type="button" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notes | Student Management</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>StudentMS</h2>
+    <nav class="nav">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" class="active">Notes</a>
+      <a href="#">Students</a>
+      <a href="#">Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <h1>Notes</h1>
+      <button class="btn btn-primary" style="width:auto;padding:8px 14px;">
+        + Add Note
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <section class="content">
+
+      <div class="table-card">
+        <h2>All Notes</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Student</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>Math Assignment</td>
+              <td>Rohan Sharma</td>
+              <td>12 Jan 2026</td>
+              <td>
+                <div class="table-actions">
+                  <button class="action-btn action-edit">Edit</button>
+                  <button class="action-btn action-delete">Delete</button>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Physics Notes</td>
+              <td>Anjali Verma</td>
+              <td>10 Jan 2026</td>
+              <td>
+                <div class="table-actions">
+                  <button class="action-btn action-edit">Edit</button>
+                  <button class="action-btn action-delete">Delete</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+    </section>
+
+  </div>
+</div>
+
+</body>
+</html>
