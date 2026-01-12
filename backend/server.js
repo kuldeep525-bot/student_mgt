@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
+import cors from "cors";
 import connectdb from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import notesRoutes from "./src/routes/notes.routes.js";
@@ -13,6 +14,16 @@ const app = express();
 const port = 4000;
 
 await connectdb();
+
+//corse ka middleware
+app.use(
+  cors({
+    origin: "http://localhost:5500",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // middlewares
 app.use(express.json());

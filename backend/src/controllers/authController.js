@@ -68,14 +68,12 @@ export const login = async (req, res) => {
       SecretKey,
       { expiresIn: "1d" }
     );
-
     //setup cookie
-
     const cookiesOption = {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      HttpOnly: true, //frontend js cannot access
+      httpOnly: true, //frontend js cannot access
       secure: false,
-      sameSite: "strict", //CSRF prvenetion
+      sameSite: "lax", //CSRF prvenetion
     };
 
     //store token in cookie
@@ -85,7 +83,7 @@ export const login = async (req, res) => {
     //success response
     res.status(200).json({
       message: "User login Successfully",
-      token: token,
+      jwt: token,
       user: {
         id: userexits._id,
         name: userexits.name,

@@ -3,14 +3,14 @@ import { body } from "express-validator";
 export const registerValidations = [
   body("name")
     .notEmpty()
-    .withMessage("Name is required")
+    .withMessage("Name is required.")
     .isLength({ min: 3 })
-    .withMessage("Name must be at least 3 character long"),
+    .withMessage("Name must be at least 3 character long."),
   body("email")
     .notEmpty()
-    .withMessage("Email is required")
+    .withMessage("Email is required.")
     .isEmail()
-    .withMessage("Email is not valid"),
+    .withMessage("Email is not valid."),
 
   body("password")
     .isStrongPassword({
@@ -20,5 +20,8 @@ export const registerValidations = [
       minNumbers: 1,
       minSymbols: 1,
     })
-    .withMessage("Password is not strong enough"),
+
+    .withMessage(
+      "Password must be at least 8 characters long and include one lowercase letter, one uppercase letter, one number, and one symbol."
+    ),
 ];

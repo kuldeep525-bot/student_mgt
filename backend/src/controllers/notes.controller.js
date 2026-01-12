@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Notes from "../models/notes.model.js";
+import User from "../models/user.Model.js";
 
 export const createNotes = async (req, res) => {
   try {
@@ -76,6 +77,8 @@ export const GetAllNOTES = async (req, res) => {
       .limit(limit)
       .sort({ createdAt: -1 }); // latest first;
 
+    const user = await User.findById(userId).select("name email"); //useful for send the info to the frontend
+
     const totalPages = Math.ceil(totalNotes / limit);
     if (note.length == 0) {
       return res.status(200).json({
@@ -90,6 +93,7 @@ export const GetAllNOTES = async (req, res) => {
       totalPages: totalPages,
       totalNotes: totalNotes,
       notes: note,
+      user,
     });
   } catch (error) {
     console.log(error);
@@ -171,4 +175,3 @@ export const UpdateNotes = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
