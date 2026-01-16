@@ -1,8 +1,5 @@
-//fetch Notes
-
 async function fetchNotes() {
   try {
-    //get all notes api
     const response = await fetch(
       "http://localhost:4000/api/notes/getallnotes",
       {
@@ -17,32 +14,66 @@ async function fetchNotes() {
     }
 
     const data = await response.json();
+    console.log(data);
 
-    //show the userName to the top
-
+    // username
     document.getElementById(
       "username"
-    ).innerText = `Hello 👋,${data.user.name}`;
+    ).innerText = `Hello 👋, ${data.user.name}`;
 
+    // total notes
     document.getElementById("totalNotes").innerText = data.totalNotes;
+
     const table = document.getElementById("notesTable");
     table.innerHTML = "";
 
-    data.notes.forEach((note) => {
+    // empty state
+    if (data.notes.length === 0) {
+      table.innerHTML = `
+        <tr>
+          <td colspan="2" style="text-align:center; padding:20px;">
+            No notes found 📭
+          </td>
+        </tr>
+      `;
+      document.getElementById("lastUpdated").innerText = "—";
+      return;
+    }
+
+    // sort notes by createdAt descending for lastUpdated
+    const sortedNotes = data.notes.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    // last updated (latest note)
+    const latestDate = new Date(sortedNotes[0].createdAt);
+    document.getElementById("lastUpdated").innerText =
+      latestDate.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+
+    // notes render
+    sortedNotes.forEach((note) => {
+      const createdDate = new Date(note.createdAt);
+      const formattedDate = createdDate.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${note.title}</td>
-        <td>${new Date(note.createdAt).toLocaleDateString()}</td>
-        <td>
-          <button onclick="editNote('${note._id}')">Edit</button>
-          <button onclick="deleteNote('${note._id}')">Delete</button>
-        </td>
+        <td data-label="Title">${note.title}</td>
+        <td data-label="Created">${formattedDate}</td>
       `;
 
       table.appendChild(row);
     });
   } catch (error) {
+    console.error(error);
     alert("Failed to load notes");
   }
 }

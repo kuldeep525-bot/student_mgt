@@ -13,6 +13,7 @@ const NotesSchema = mongoose.Schema(
     UserNote: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
   },
   { timestamps: true }

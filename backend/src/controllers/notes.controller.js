@@ -73,11 +73,12 @@ export const GetAllNOTES = async (req, res) => {
       UserNote: userId,
     });
     const note = await Notes.find({ UserNote: userId })
+      .populate("UserNote", "name email")
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 }); // latest first;
 
-    const user = await User.findById(userId).select("name email"); //useful for send the info to the frontend
+    const user = await User.findById(userId);
 
     const totalPages = Math.ceil(totalNotes / limit);
     if (note.length == 0) {

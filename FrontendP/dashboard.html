@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | StudentMGT</title>
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/component.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <header class="navbar">
+      <div class="container">
+        <div class="logo">StudentMGT</div>
+        <div class="nav-actions">
+          <a href="#">Profile</a>
+          <a href="#">Logout</a>
+        </div>
+
+        <div class="menu-btn">☰</div>
+      </div>
+    </header>
+
+    <div class="mobile-menu">
+      <a href="#">Profile</a>
+      <a href="#">Logout</a>
+    </div>
+
+    <!-- DASHBOARD -->
+    <main class="dashboard container">
+      <div class="dashboard-header">
+        <h2>Your Notes</h2>
+        <button class="btn">+ Add Note</button>
+      </div>
+      <div class="alert alert-success">Note saved successfully</div>
+
+      <!-- NOTES GRID -->
+      <section class="notes-grid">
+        <!-- NOTE CARD -->
+        <div class="note-card">
+          <h3 class="note-title">First Note</h3>
+          <p class="note-desc">
+            This is a sample note description for UI preview.
+          </p>
+          <div class="note-actions">
+            <button class="edit">Edit</button>
+            <button class="delete">Delete</button>
+          </div>
+        </div>
+
+        <div class="note-card">
+          <h3 class="note-title">Second Note</h3>
+          <p class="note-desc">Another note example for dashboard layout.</p>
+          <div class="note-actions">
+            <button class="edit">Edit</button>
+            <button class="delete">Delete</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- EMPTY STATE -->
+      <div class="empty" style="display: none">
+        <p>No notes found. Create your first note 🚀</p>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="pagination">
+        <button class="page-btn" disabled>Prev</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">Next</button>
+      </div>
+
+      <!-- EMPTY STATE (JS se toggle hoga) -->
+      <!--
+    <div class="empty">
+      <p>No notes found. Create your first note 🚀</p>
+    </div>
+    -->
+      <!-- ADD / EDIT NOTE MODAL -->
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal-header">
+            <h3 class="modal-title">Add Note</h3>
+            <span class="close-btn">&times;</span>
+          </div>
+
+          <form>
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" placeholder="Note title" />
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea placeholder="Write note..."></textarea>
+            </div>
+
+            <button class="btn">Save Note</button>
+          </form>
+        </div>
+      </div>
+      <!-- GLOBAL LOADER -->
+      <div class="loader-overlay">
+        <div class="loader"></div>
+      </div>
+    </main>
+  </body>
+</html>

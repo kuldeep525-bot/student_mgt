@@ -1,101 +1,86 @@
-//import pe dikkat a rhi hai
-//register form
-const registerForm = document.getElementById("registerForm");
-const loginForm = document.getElementById("loginForm");
+// auth.js
+(function () {
+  // REGISTER
+  let registerForm = document.getElementById("registerForm");
+  if (registerForm) {
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-//swithc UI
-
-function showRegister() {
-  loginForm.classList.remove("active");
-  registerForm.classList.add("active");
-}
-
-function showLogin() {
-  registerForm.classList.remove("active");
-  loginForm.classList.add("active");
-}
-
-registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault(); //page ko reload hona se rokta hai
-  //input value uthao
-
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  //validation
-
-  if (!name || !email || !password) {
-    alert("All fields are required");
-    return;
-  }
-
-  try {
-    const response = await fetch("http://localhost:4000/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await response.json();
-
-    console.log(data.message);
-
-    if (response.ok) {
-      alert("Registration successful");
-      window.location.href = "login.html";
-    }
-
-    if (!response.ok) {
-      if (Array.isArray(data.error)) {
-        alert(data.error.join("\n"));
-      } else {
-        alert(data.message);
+      if (!name || !email || !password) {
+        alert("All fields are required");
+        return;
       }
-      return;
-    }
-  } catch (error) {
-    alert("Server error");
-    console.error(error);
-  }
-});
 
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+      try {
+        const response = await fetch(
+          "http://localhost:4000/api/auth/register",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password }),
+          }
+        );
 
-  //input value uthao
-  const email = document.getElementById("loginemail").value.trim();
-  const password = document.getElementById("loginpassword").value.trim();
+        const data = await response.json();
 
-  //validation
-
-  if (!email || !password) {
-    alert("All fields are required");
-    return;
-  }
-
-  //main work backend ki api call karo
-  try {
-    const response = await fetch("http://localhost:4000/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ email, password }),
+        if (response.ok) {
+          alert("Registration successful");
+          window.location.href = "login.html";
+        } else {
+          alert(
+            data.message ||
+              (Array.isArray(data.error) ? data.error.join("\n") : "")
+          );
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server error");
+      }
     });
-
-    const data = await response.json();
-    if (!response.ok) {
-      alert(data.message || "Login failed");
-      return;
-    }
-
-    alert("Login successful");
-    window.location.href = "dashboard.html";
-  } catch (error) {
-    alert("Server error");
   }
-});
+
+  // LOGIN
+  let loginForm = document.getElementById("loginForm");
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginemail").value.trim();
+      const password = document.getElementById("loginpassword").value.trim();
+
+      if (!email || !password) {
+        alert("All fields are required");
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:4000/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("Login successful");
+          // Redirect to dashboard
+          // From index.html or login.html (adjust path)
+          if (window.location.pathname.endsWith("index.html")) {
+            window.location.href = "pages/dashboard.html";
+          } else {
+            window.location.href = "dashboard.html";
+          }
+        } else {
+          alert(data.message || "Login failed");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server error");
+      }
+    });
+  }
+})();
