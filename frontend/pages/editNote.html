@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Update Note | Student Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #2563eb;
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+
+      body {
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .update-container {
+        width: 100%;
+        max-width: 520px;
+        background: var(--card);
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        padding: 28px;
+      }
+
+      .page-title {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text);
+      }
+
+      .page-subtitle {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 24px;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 14px;
+        outline: none;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: var(--primary);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .btn-update {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .btn-cancel {
+        background: #e5e7eb;
+        color: #111827;
+      }
+
+      @media (max-width: 480px) {
+        .update-container {
+          padding: 22px;
+        }
+
+        .page-title {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="update-container">
+      <h1 class="page-title">Update Note</h1>
+      <p class="page-subtitle">Edit your note details and save changes</p>
+
+      <form>
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title">Note Title</label>
+          <input type="text" id="title" placeholder="Enter note title" />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Note Description</label>
+          <textarea
+            id="description"
+            placeholder="Enter note description"
+          ></textarea>
+        </div>
+
+        <!-- Buttons -->
+        <div class="action-buttons">
+          <button type="submit" class="btn btn-update">Update Note</button>
+          <button type="button" id="cancel" class="btn btn-cancel">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+    <script src="../js/editNotes.js"></script>
+  </body>
+</html>

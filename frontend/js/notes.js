@@ -80,3 +80,26 @@ function formatDate(dateString) {
     year: "numeric",
   });
 }
+
+tableBody.addEventListener("click", (e) => {
+  // EDIT NOTE
+  if (e.target.classList.contains("action-edit")) {
+    const noteId = e.target.dataset.id;
+
+    // redirect to update page
+    window.location.href = `editNote.html`;
+  }
+
+  // DELETE NOTE
+  if (e.target.classList.contains("action-delete")) {
+    const noteId = e.target.dataset.id;
+
+    // abhi ke liye redirect ya console
+    console.log("Delete note id:", noteId);
+
+    // future:
+    // openDeleteModal(noteId);
+    // ya
+    // deleteNote(noteId);
+  }
+});
