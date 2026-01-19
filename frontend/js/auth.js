@@ -1,86 +1,112 @@
-// auth.js
-(function () {
-  // REGISTER
-  let registerForm = document.getElementById("registerForm");
-  if (registerForm) {
-    registerForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+import { API_BASE_URL } from "./config.js";
 
-      if (!name || !email || !password) {
-        alert("All fields are required");
-        return;
+//REGISTER
+const registerForm = document.getElementById("registerForm");
+if (registerForm) {
+  registerForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); //page reload hona se rokta hai
+
+    //take all the value that are required to register
+    //trim() useful for extra spaces
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    //backend api call with fetch and async and await
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", //save jwt in the cookies
+        body: JSON.stringify({ name, email, password }), //js object=> json
+      });
+
+      //jo backend se data ayega voh hum data me store kar lnga
+      const data = await response.json().catch(() => null);
+
+      //error handling
+      if (response.ok) {
+        alert("Registration Successful");
+        window.location.href = "login.html";
       }
-
-      try {
-        const response = await fetch(
-          "http://localhost:4000/api/auth/register",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password }),
-          }
+      //  Backend se error message aaya → dikha diya
+      //  Multiple errors ho to join kar diya
+      else {
+        alert(
+          data.message ||
+            (Array.isArray(data.error) ? data.error.join("\n") : ""),
         );
-
-        const data = await response.json();
-
-        if (response.ok) {
-          alert("Registration successful");
-          window.location.href = "login.html";
-        } else {
-          alert(
-            data.message ||
-              (Array.isArray(data.error) ? data.error.join("\n") : "")
-          );
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Server error");
       }
-    });
-  }
+    } catch (error) {
+      console.error("Register error:", error);
+      alert("Something went wrong");
+    }
+  });
+}
 
-  // LOGIN
-  let loginForm = document.getElementById("loginForm");
-  if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("loginemail").value.trim();
-      const password = document.getElementById("loginpassword").value.trim();
+/* ================= LOGIN ================= */
 
-      if (!email || !password) {
-        alert("All fields are required");
+const loginForm = document.getElementById("loginForm");
+
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        alert(data?.message || "Login failed");
         return;
       }
 
-      try {
-        const response = await fetch("http://localhost:4000/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ email, password }),
-        });
+      alert("Login Successfully");
+      window.location.href = "../dashboard.html";
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Something went wrong");
+    }
+  });
+}
 
-        const data = await response.json();
+const logout = document.getElementById("logout");
+console.log(logout);
 
-        if (response.ok) {
-          alert("Login successful");
-          // Redirect to dashboard
-          // From index.html or login.html (adjust path)
-          if (window.location.pathname.endsWith("index.html")) {
-            window.location.href = "pages/dashboard.html";
-          } else {
-            window.location.href = "dashboard.html";
-          }
-        } else {
-          alert(data.message || "Login failed");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Server error");
+if (logout) {
+  logout.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        alert(data?.message || "Logout failed");
+        return;
       }
-    });
-  }
-})();
+
+      alert("Logout Successfully");
+      window.location.href = "../index.html";
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Something went wrong");
+    }
+  });
+}

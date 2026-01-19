@@ -15,8 +15,12 @@ const NotesSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Notes = mongoose.model("Notes", NotesSchema);

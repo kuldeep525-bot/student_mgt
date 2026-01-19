@@ -71,8 +71,9 @@ export const GetAllNOTES = async (req, res) => {
     const skip = (page - 1) * limit;
     const totalNotes = await Notes.countDocuments({
       UserNote: userId,
+      isDeleted: false,
     });
-    const note = await Notes.find({ UserNote: userId })
+    const note = await Notes.find({ UserNote: userId, isDeleted: false })
       .populate("UserNote", "name email")
       .skip(skip)
       .limit(limit)
@@ -111,7 +112,11 @@ export const DeleteNotes = async (req, res) => {
       return res.status(400).json({ message: "Invalid NoteID" });
     }
 
-    const SoftDelNotes = await Notes.findById(noteId);
+    const SoftDelNotes = await Notes.findOne({
+      _id: userId,
+      UserNote: noteId,
+      isDeleted: false,
+    });
 
     if (!SoftDelNotes) {
       return res
@@ -123,7 +128,12 @@ export const DeleteNotes = async (req, res) => {
     if (SoftDelNotes.UserNote.toString() !== userId) {
       return res.status(400).json({ message: "Acess Denied" });
     }
-    await Notes.findByIdAndDelete(noteId);
+
+    //agar hum user ki id or noteid se find out kar leta hai toh hum sirif user ko soft delte karenga
+
+    SoftDelNotes.isDeleted = true;
+    await SoftDelNotes.save();
+
     res.status(200).json({
       message: "Note deleted successfully",
     });
