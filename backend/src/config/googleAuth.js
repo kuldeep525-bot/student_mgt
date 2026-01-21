@@ -8,10 +8,9 @@ import User from "../models/user.Model.js";
 passport.use(
   new GoogleStrategy(
     {
-      clientID:
-        "197607402547-88pf5v97ohpgl1rmt6ned67koevfhe7p.apps.googleusercontent.com",
-      clientSecret: "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",
-      callbackURL: "http://localhost:4000/api/auth/google/callback",
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.CALLBACK_URL,
     },
     //jab google successfull login kar deta hai tab yeh function apna ap call hota hai
     //profile me user ka all data hota hai
