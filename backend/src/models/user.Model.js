@@ -17,10 +17,10 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: true,
     },
+    googleId: String,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = model("User", userSchema);

@@ -1,54 +1,70 @@
-::selection {
-  background-color: gray;
-  color: #1a181a;
-}
-
+/* ----------  root variables  ---------- */
 :root {
-  --bg-dark: #0b0b0c;
-  --bg-light: #121214;
-  --text-primary: #ffffff;
+  /* DARK (default) */
+  --bg-main: radial-gradient(circle at top, #1a1a1d, #000);
+  --bg-card: rgba(255, 255, 255, 0.06);
+  --bg-soft: #0b0b0c;
+  --text-primary: #fff;
   --text-secondary: #b5b5b8;
   --border-color: rgba(255, 255, 255, 0.15);
-  --accent: #ffffff;
 }
 
-* {
+.light-theme {
+  /* LIGHT */
+  --bg-main: linear-gradient(180deg, #f6f7fb, #fff);
+  --bg-card: rgba(0, 0, 0, 0.05);
+  --bg-soft: #fff;
+  --text-primary: #111;
+  --text-secondary: #555;
+  --border-color: rgba(0, 0, 0, 0.15);
+}
+
+/* ----------  reset  ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  transition:
+    background 0.4s ease,
+    color 0.4s ease;
 }
 
 body {
   font-family: "Inter", sans-serif;
-  background: radial-gradient(circle at top, #1a1a1d, #000);
+  background: var(--bg-main);
   color: var(--text-primary);
   min-height: 100vh;
+  padding: 1rem 2rem;
 }
 
-/* ---------------- Navbar ---------------- */
-
+/* ----------  navbar  ---------- */
 .navbar {
   padding: 20px 40px;
 }
 
 .nav-container {
-  border: 1px solid rgb(147, 146, 146);
-  box-shadow: 5px 5px 20px rgba(134, 134, 134, 0.38);
-  border-radius: 50px;
-  padding: 0.9rem 3rem;
   max-width: 1200px;
   margin: auto;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  padding: 0.9rem 3rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
 }
 
 .logo {
   font-weight: 600;
   letter-spacing: 1px;
 }
-
-/* Nav links */
 
 .nav-links {
   display: flex;
@@ -60,7 +76,6 @@ body {
   text-decoration: none;
   font-size: 14px;
   position: relative;
-  padding-bottom: 2px;
 }
 
 .nav-links a::after {
@@ -68,17 +83,15 @@ body {
   position: absolute;
   left: 0;
   bottom: -2px;
-  width: 0%;
+  width: 0;
   height: 1px;
-  background-color: rgba(191, 192, 191, 0.85);
-  transition: width 0.3s ease;
+  background: rgba(191, 192, 191, 0.85);
+  transition: 0.3s;
 }
 
 .nav-links a:hover::after {
   width: 100%;
 }
-
-/* Actions */
 
 .nav-actions {
   display: flex;
@@ -87,12 +100,17 @@ body {
 }
 
 .icon-btn {
-  background: none;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  color: white;
-  padding: 6px 10px;
+  color: var(--text-primary);
+  padding: 0.6rem 0.8rem;
   border-radius: 50%;
   cursor: pointer;
+  transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.icon-btn:hover {
+  transform: rotate(240deg);
 }
 
 .login-link {
@@ -101,6 +119,7 @@ body {
   font-size: 14px;
 }
 
+/* ----------  buttons  ---------- */
 .btn {
   padding: 10px 18px;
   border-radius: 999px;
@@ -114,15 +133,28 @@ body {
 
 .btn-outline {
   border: 1px solid var(--border-color);
-  color: white;
+  color: var(--text-primary);
 }
 
 .btn-outline:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(127, 127, 127, 0.1);
 }
 
-/* ---------------- Hero ---------------- */
+.btn-primary {
+  background: #fff;
+  color: #000;
+}
 
+.btn-secondary {
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: rgba(127, 127, 127, 0.1);
+}
+
+/* ----------  hero  ---------- */
 .hero {
   display: flex;
   align-items: center;
@@ -155,36 +187,17 @@ body {
   line-height: 1.6;
   margin-bottom: 36px;
   max-width: 760px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
   padding: 0 1rem;
 }
-
-/* Buttons */
 
 .hero-buttons {
   display: flex;
   justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
-  margin: 30px 40px;
+  margin: 30px 0;
 }
-
-.btn-primary {
-  background: white;
-  color: black;
-}
-
-.btn-secondary {
-  border: 1px solid var(--border-color);
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Features */
 
 .features {
   display: flex;
@@ -202,8 +215,233 @@ body {
   color: var(--text-secondary);
 }
 
-/* ---------------- Responsive ---------------- */
+/* ----------  app window (page-2)  ---------- */
+.page-2 {
+  font-family: "Inter", sans-serif;
+  /* background: var(--bg-main); */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  padding: 4rem 1rem;
+}
 
+.app-window {
+  width: 95%;
+  max-width: 1200px;
+  background: var(--bg-main);
+  border-radius: 24px;
+  padding: 20px 24px 32px;
+  box-shadow: 10px 14px 10px 0px rgb(0 0 0 / 26%);
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.red {
+  background: #ff5f56;
+}
+
+.yellow {
+  background: #ffbd2e;
+}
+
+.green {
+  background: #27c93f;
+}
+
+.app-title {
+  color: #b5b5b8;
+  font-size: 14px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 28px 0;
+}
+
+.card {
+  border-radius: 20px;
+  padding: 24px;
+  color: #0b0b0c;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.card p {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pink {
+  background: #f7e8e6;
+}
+
+.blue {
+  background: #e6f4f7;
+}
+
+.green {
+  background: #e9f7e6;
+}
+
+.cream {
+  background: #f6f1e7;
+}
+
+/* ----------  notes-preview (dark / light)  ---------- */
+.notes-preview {
+  margin-top: 10px;
+  background: var(--bg-card);
+  /* light:white-90%  / dark:6%-white */
+  border-radius: 32px;
+  padding: 28px;
+  border: 1px solid var(--border-color);
+  border-bottom: 5px solid #74ff7428;
+  /* your accent colour */
+}
+
+/* skeleton lines */
+.line {
+  height: 14px;
+  background: var(--text-secondary);
+  /* light:#555  / dark:#b5b5b8 */
+  opacity: 0.35;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.line.title {
+  width: 50%;
+  height: 18px;
+}
+
+.line.small {
+  width: 70%;
+}
+
+/* footer dots */
+.footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.footer span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgb(255, 191, 73);
+  /* default */
+}
+
+.footer span:nth-child(1) {
+  background: #5dff75;
+}
+
+.footer span:nth-child(2) {
+  background: rgb(255, 71, 71);
+}
+
+/* ----------  features grid (page-3)  ---------- */
+.features-section {
+  padding: 80px 20px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  text-align: center;
+  width: 100%;
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 2rem;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  padding: 32px;
+  text-align: left;
+  transition:
+    transform 0.3s,
+    border 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(127, 127, 127, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.feature-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ----------  responsive micro-fixes  ---------- */
 @media (max-width: 768px) {
   .nav-links {
     display: none;
@@ -243,4 +481,108 @@ body {
   .hero p {
     font-size: 14px;
   }
+}
+
+@media (max-width: 360px) {
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .hero p {
+    font-size: 14px;
+    padding: 0 0.5rem;
+  }
+}
+
+/* keep buttons on one line on very small screens */
+@media (max-width: 400px) {
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .nav-actions .btn-outline {
+    display: inline-flex;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+/* --------------------------------------------------
+   Responsive patch : 375 px and below
+   -------------------------------------------------- */
+@media (max-width: 375px) {
+
+  /* --- navbar --- */
+  .navbar {
+    padding: 12px 16px;
+  }
+
+  .btn btn-outline {
+    display: hidden;
+  }
+
+  .nav-container {
+    padding: 0.5rem 1rem;
+    /* tighter capsule */
+    border-radius: 40px;
+    gap: 0.5rem;
+  }
+
+  .logo {
+    font-size: 14px;
+  }
+
+  /* keep text readable */
+
+  /* hide links, keep actions */
+  .nav-links {
+    display: none;
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+
+  /* smaller buttons */
+  .icon-btn {
+    padding: 0.45rem;
+    /* ~36 px total */
+    font-size: 18px;
+    /* icon stays centred */
+  }
+
+  .login-link {
+    font-size: 12px;
+  }
+
+  .btn-outline {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  /* --- hero --- */
+  .hero {
+    padding: 48px 12px;
+  }
+
+  .hero h1 {
+    font-size: 26px;
+  }
+
+  .hero p {
+    font-size: 13px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 160px;
+  }
+
+  /* same-width buttons */
 }

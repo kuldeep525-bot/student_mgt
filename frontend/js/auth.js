@@ -84,7 +84,6 @@ if (loginForm) {
 }
 
 const logout = document.getElementById("logout");
-console.log(logout);
 
 if (logout) {
   logout.addEventListener("click", async (e) => {
@@ -99,6 +98,7 @@ if (logout) {
 
       if (!response.ok) {
         alert(data?.message || "Logout failed");
+        window.location.href = "login.html";
         return;
       }
 

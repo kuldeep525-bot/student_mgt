@@ -1,12 +1,13 @@
 import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import connectdb from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import notesRoutes from "./src/routes/notes.routes.js";
 import cookieParser from "cookie-parser";
-
-dotenv.config();
+import passport from "passport";
+import "./src/config/googleAuth.js";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(
 );
 
 // middlewares
+app.use(passport.initialize());
 app.use(express.json());
 app.use(cookieParser());
 

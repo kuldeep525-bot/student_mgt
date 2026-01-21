@@ -12,6 +12,7 @@ body {
   align-items: center;
   justify-content: center;
   color: white;
+  padding: 0 4rem;
 }
 
 /* App Card */
@@ -22,8 +23,8 @@ body {
   background: #050506;
   border-radius: 22px;
   padding: 32px;
-  box-shadow: 0 0 60px rgba(0,0,0,0.8);
-  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Header */
@@ -54,7 +55,7 @@ body {
 
 .auth-form input {
   background: #0e0e10;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 12px 14px;
   border-radius: 10px;
   color: white;
@@ -78,8 +79,13 @@ body {
 }
 
 .btn-primary {
-  background: white;
+  background: rgb(190, 187, 187);
   color: black;
+}
+
+.btn-primary:hover {
+  background: white;
+
 }
 
 .btn-danger {

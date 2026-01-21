@@ -33,8 +33,7 @@ export const GetNOTES = async (req, res) => {
   try {
     const userId = req.userId;
     const noteId = req.params.noteId;
-    const note = await Notes.findById(noteId);
-
+    const note = await Notes.findOne({ _id: noteId, isDeleted: false });
     if (!note) {
       return res.status(404).json({ message: "Notes Not found" });
     }
@@ -79,7 +78,7 @@ export const GetAllNOTES = async (req, res) => {
       .limit(limit)
       .sort({ createdAt: -1 }); // latest first;
 
-    const user = await User.findById(userId);
+    const user = await User.findOne({ _id: userId, isDeleted: false });
 
     const totalPages = Math.ceil(totalNotes / limit);
     if (note.length == 0) {
@@ -113,8 +112,8 @@ export const DeleteNotes = async (req, res) => {
     }
 
     const SoftDelNotes = await Notes.findOne({
-      _id: userId,
-      UserNote: noteId,
+      _id: noteId,
+      UserNote: userId,
       isDeleted: false,
     });
 
