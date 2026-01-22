@@ -18,7 +18,27 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
-    googleId: String,
+
+    googleId: {
+      type: String,
+    },
+
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
+    status: {
+      type: String,
+      enum: ["active", "blocked"],
+      default: "active",
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );

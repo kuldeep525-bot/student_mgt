@@ -3,62 +3,181 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Memora Dashboard</title>
+    <title>Memora – Notes Dashboard</title>
 
+    <!-- Font -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/dashboard.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./css/dashboard.css" />
   </head>
+
   <body>
-    <main class="app-window">
-      <!-- App Header -->
-      <div class="app-header">
-        <div class="dots">
-          <span class="red"></span>
-          <span class="yellow"></span>
-          <span class="green"></span>
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside>
+        <div class="logo">Memora</div>
+
+        <nav>
+          <div class="nav-item active" data-tooltip="Dashboard overview">
+            <i class="ri-layout-grid-line"></i>Dashboard
+          </div>
+          <div class="nav-item" data-tooltip="All your notes">
+            <i class="ri-sticky-note-line"></i>Notes
+          </div>
+          <div class="nav-item" data-tooltip="Starred notes">
+            <i class="ri-star-line"></i>Favorites
+          </div>
+          <div class="nav-item" data-tooltip="Deleted notes">
+            <i class="ri-delete-bin-line"></i>Bin
+          </div>
+          <div class="nav-item" data-tooltip="Archived notes">
+            <i class="ri-archive-line"></i>Archive
+          </div>
+        </nav>
+
+        <div class="nav-bottom">
+          <div class="nav-item" id="themeToggle" data-tooltip="Toggle theme">
+            <i class="ri-moon-line"></i>Theme
+          </div>
+          <div class="nav-item" data-tooltip="App settings">
+            <i class="ri-settings-3-line"></i>Settings
+          </div>
         </div>
-        <span class="app-title">memora.app</span>
+      </aside>
+
+      <!-- MAIN -->
+      <main>
+        <header>
+          <div>
+            <h1>Recent Notes</h1>
+            <p class="subtitle">Notes from the last 2 days</p>
+          </div>
+
+          <div class="search">
+            <i class="ri-search-line"></i>
+            <input id="searchInput" placeholder="Search notes..." />
+          </div>
+
+          <div class="actions">
+            <button id="addNote" class="btn primary">+ Add Note</button>
+          </div>
+        </header>
+
+        <section id="notesGrid" class="notes-grid"></section>
+
+        <div id="emptyState" class="empty">
+          <h3>No notes yet</h3>
+          <p class="quote">
+            “Notes help you remember ideas. Writing helps you understand them.”
+          </p>
+        </div>
+      </main>
+
+      <!-- MODAL -->
+      <div id="noteModal" class="modal">
+        <div class="modal-box">
+          <h3>Add Note</h3>
+          <input id="noteTitle" placeholder="Title" />
+          <textarea
+            id="noteContent"
+            placeholder="Write your note..."
+          ></textarea>
+          <div class="modal-actions">
+            <button id="closeModal" class="btn">Cancel</button>
+            <button id="saveNote" class="btn primary">Save</button>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <!-- Cards -->
-      <section class="cards">
-        <div class="card pink">
-          <h3>Project Ideas</h3>
-          <p>3 notes</p>
-        </div>
+    <script>
+      let notes = JSON.parse(localStorage.getItem("memora_notes") || "[]");
 
-        <div class="card blue">
-          <h3>Reading List</h3>
-          <p>5 notes</p>
-        </div>
+      const grid = document.getElementById("notesGrid");
+      const empty = document.getElementById("emptyState");
+      const searchInput = document.getElementById("searchInput");
+      const themeToggle = document.getElementById("themeToggle");
+      const addBtn = document.getElementById("addNote");
+      const modal = document.getElementById("noteModal");
+      const closeModal = document.getElementById("closeModal");
+      const saveNote = document.getElementById("saveNote");
+      const noteTitle = document.getElementById("noteTitle");
+      const noteContent = document.getElementById("noteContent");
 
-        <div class="card green">
-          <h3>Daily Journal</h3>
-          <p>12 notes</p>
-        </div>
+      const savedTheme = localStorage.getItem("memora_theme");
+      if (savedTheme === "light") document.body.classList.add("light-theme");
 
-        <div class="card cream">
-          <h3>Work Tasks</h3>
-          <p>8 notes</p>
-        </div>
-      </section>
+      themeToggle.onclick = () => {
+        document.body.classList.toggle("light-theme");
+        localStorage.setItem(
+          "memora_theme",
+          document.body.classList.contains("light-theme") ? "light" : "dark",
+        );
+      };
 
-      <!-- Notes Preview -->
-      <section class="notes-preview">
-        <div class="line title"></div>
-        <div class="line"></div>
-        <div class="line"></div>
-        <div class="line small"></div>
+      addBtn.onclick = () => modal.classList.add("active");
+      closeModal.onclick = () => modal.classList.remove("active");
 
-        <div class="footer">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </section>
-    </main>
+      function render(list) {
+        grid.innerHTML = "";
+        if (!list.length) {
+          empty.style.display = "block";
+          return;
+        }
+        empty.style.display = "none";
+
+        list.forEach((n) => {
+          const div = document.createElement("div");
+          div.className = "note";
+          div.innerHTML = `<h4>${n.title}</h4><p>${n.content}</p>`;
+          grid.appendChild(div);
+        });
+      }
+
+      saveNote.onclick = () => {
+        if (!noteTitle.value || !noteContent.value) return;
+        notes.unshift({
+          id: Date.now(),
+          title: noteTitle.value,
+          content: noteContent.value,
+        });
+        localStorage.setItem("memora_notes", JSON.stringify(notes));
+        render(notes);
+        noteTitle.value = "";
+        noteContent.value = "";
+        modal.classList.remove("active");
+      };
+
+      function debounce(fn, d = 400) {
+        let t;
+        return (...a) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...a), d);
+        };
+      }
+
+      const handleSearch = debounce((v) => {
+        v = v.toLowerCase();
+        render(
+          notes.filter(
+            (n) =>
+              n.title.toLowerCase().includes(v) ||
+              n.content.toLowerCase().includes(v),
+          ),
+        );
+      });
+
+      searchInput.addEventListener("input", (e) =>
+        handleSearch(e.target.value),
+      );
+      render(notes);
+    </script>
   </body>
 </html>

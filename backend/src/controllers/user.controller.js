@@ -5,7 +5,7 @@ const SecretKey = "studentMangement@_525";
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     //validation
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -28,6 +28,7 @@ export const register = async (req, res) => {
       name,
       email,
       password: hashPassword,
+      role,
     });
 
     res.status(201).json({ message: "User created successfully", dataStore });
@@ -64,9 +65,10 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       {
         userId: userexits._id,
+        role: userexits.role,
       },
       SecretKey,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
     //setup cookie
     const cookiesOption = {
@@ -88,6 +90,7 @@ export const login = async (req, res) => {
         id: userexits._id,
         name: userexits.name,
         email: userexits.email,
+        role: userexits.role,
       },
     });
   } catch (error) {

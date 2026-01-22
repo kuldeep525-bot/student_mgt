@@ -1,5 +1,5 @@
 import express from "express";
-import { login, logout, register } from "../controllers/authController.js";
+import { login, logout, register } from "../controllers/user.controller.js";
 import { registerValidations } from "../validations/auth.validators.js";
 import { validate } from "../middleware/validate.middleware.js";
 import jwt from "jsonwebtoken";
@@ -28,7 +28,9 @@ router.get(
       expiresIn: "7d",
     });
 
-    res.redirect(`http://localhost:5500/login-success?token=${token}`);
+    res.redirect(
+      `http://localhost:5500/frontend/dashboard.html?token=${token}`,
+    );
   },
 );
 

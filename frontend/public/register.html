@@ -1,4 +1,35 @@
-<!doctype html>
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Register – Memora</title>
+      <link rel="stylesheet" href="../css/auth.css" />
+    </head>
+    <body>
+      <div class="auth-card">
+        <div class="auth-header">
+          <h2>Create account</h2>
+          <p>Start organizing your ideas</p>
+        </div>
+
+        <form class="auth-form" id="registerForm">
+          <input type="text" id="name" placeholder="Full name" required />
+          <input type="email" id="email" placeholder="Email" required />
+          <input type="password" id="password" placeholder="Password" required />
+
+          <button class="btn btn-primary">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+          Already have an account? <a href="login.html">Sign in</a>
+        </div>
+      </div>
+      <script type="module" src="../js/auth.js"></script>
+    </body>
+  </html>
+
+<!-- <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,6 +37,7 @@
     <title>Register – Memora</title>
     <link rel="stylesheet" href="../css/auth.css" />
   </head>
+
   <body>
     <div class="auth-card">
       <div class="auth-header">
@@ -20,6 +52,23 @@
 
         <button class="btn btn-primary">Create Account</button>
       </form>
+      <div class="oauth-divider">
+        <span>OR</span>
+      </div>
+
+      <button type="button" class="btn btn-google">
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="Google"
+        />
+        Continue with Google
+      </button>
+
+      <p class="oauth-terms">
+        By continuing, you agree to Memora’s
+        <a href="#">Terms of Service</a> and
+        <a href="#">Privacy Policy</a>
+      </p>
 
       <div class="auth-footer">
         Already have an account? <a href="login.html">Sign in</a>
@@ -27,4 +76,4 @@
     </div>
     <script type="module" src="../js/auth.js"></script>
   </body>
-</html>
+</html> -->

@@ -59,8 +59,8 @@ student-management-backend/
 │ │ └── admin.routes.js # Admin routes
 │ │
 │ ├── middlewares/
-│ │ ├── auth.middleware.js # JWT verify
-│ │ ├── role.middleware.js # User / Admin check
+│ │ ├── jwt.middleware.js # JWT verify
+│ │ ├── admin.middleware.js # User / Admin check
 │ │ ├── block.middleware.js # Blocked user check
 │ │ └── upload.middleware.js # Multer validation
 │ │

@@ -49,7 +49,7 @@ if (registerForm) {
 /* ================= LOGIN ================= */
 
 const loginForm = document.getElementById("loginForm");
-
+const logingoogleAuth = document.getElementById("google");
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -83,6 +83,12 @@ if (loginForm) {
   });
 }
 
+if (logingoogleAuth) {
+  logingoogleAuth.addEventListener("click", async (e) => {
+    e.preventDefault();
+    window.location.href = "http://localhost:4000/api/auth/google";
+  });
+}
 const logout = document.getElementById("logout");
 
 if (logout) {

@@ -6,6 +6,7 @@
     <title>Login – Memora</title>
     <link rel="stylesheet" href="../css/auth.css" />
   </head>
+
   <body>
     <div class="auth-card">
       <div class="auth-header">
@@ -19,6 +20,23 @@
 
         <button class="btn btn-primary">Sign In</button>
       </form>
+      <div class="oauth-divider">
+        <span>OR</span>
+      </div>
+
+      <button type="button" class="btn btn-google">
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="Google"
+        />
+        <p id="google">Continue with Google</p>
+      </button>
+
+      <p class="oauth-terms">
+        By continuing, you agree to Memora’s
+        <a href="#">Terms of Service</a> and
+        <a href="#">Privacy Policy</a>
+      </p>
 
       <div class="auth-footer">
         Don’t have an account? <a href="register.html">Create one</a>

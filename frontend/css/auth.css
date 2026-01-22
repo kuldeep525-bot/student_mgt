@@ -15,6 +15,25 @@ body {
   padding: 0 4rem;
 }
 
+/* ================= THEME SUPPORT ================= */
+:root {
+  --bg-main: radial-gradient(circle at top, #1a1a1d, #000);
+  --bg-card: rgba(255, 255, 255, 0.06);
+  --bg-soft: #0b0b0c;
+  --text-primary: #fff;
+  --text-secondary: #b5b5b8;
+  --border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.light-theme {
+  --bg-main: linear-gradient(180deg, #f6f7fb, #fff);
+  --bg-card: rgba(0, 0, 0, 0.05);
+  --bg-soft: #fff;
+  --text-primary: #111;
+  --text-secondary: #555;
+  --border-color: rgba(0, 0, 0, 0.15);
+}
+
 /* App Card */
 
 .auth-card {
@@ -85,7 +104,6 @@ body {
 
 .btn-primary:hover {
   background: white;
-
 }
 
 .btn-danger {
@@ -105,4 +123,66 @@ body {
 .auth-footer a {
   color: white;
   text-decoration: none;
+}
+
+/* ================= GOOGLE AUTH ================= */
+.oauth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.oauth-divider::before,
+.oauth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 20px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 500;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-google img {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-google:hover {
+  background: var(--bg-card);
+  transform: translateY(-1px);
+}
+
+.oauth-terms {
+  margin-top: 14px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.oauth-terms a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.oauth-terms a:hover {
+  text-decoration: underline;
 }
