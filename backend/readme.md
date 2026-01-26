@@ -37,13 +37,10 @@ student-management-backend/
 │ │
 │ ├── config/
 │ │ ├── db.js # MongoDB connection
-│ │ ├── passport.js # Google OAuth client setup
-│ │ └── cloudinary.js # (V2 step) Profile upload config
+│ │ ├── googleAuth.js # Google OAuth
 │ │
 │ ├── controllers/
-│ │ ├── auth.controller.js # Login, Register, Google OAuth
-│ │ ├── password.controller.js # Forgot & Reset password
-│ │ ├── user.controller.js # Profile, block/unblock
+│ │ ├── user.controller.js # Login, Register, Google OAuth
 │ │ ├── note.controller.js # Notes CRUD (soft delete)
 │ │ └── admin.controller.js # Admin specific actions
 │ │
@@ -52,9 +49,7 @@ student-management-backend/
 │ │ └── note.model.js # Note schema (isDeleted)
 │ │
 │ ├── routes/
-│ │ ├── auth.routes.js # /login /register /google
-│ │ ├── password.routes.js # /forgot-password /reset-password
-│ │ ├── user.routes.js # /profile /upload
+│ │ ├── user.routes.js # /login /register /google
 │ │ ├── note.routes.js # Notes APIs
 │ │ └── admin.routes.js # Admin routes
 │ │
@@ -62,7 +57,7 @@ student-management-backend/
 │ │ ├── jwt.middleware.js # JWT verify
 │ │ ├── admin.middleware.js # User / Admin check
 │ │ ├── block.middleware.js # Blocked user check
-│ │ └── upload.middleware.js # Multer validation
+│ │ └── validate.middleware.js #validate middleware
 │ │
 │ ├── services/
 │ │ ├── google.service.js # Google token verification
@@ -77,7 +72,6 @@ student-management-backend/
 │ │
 │ └── server.js # Server entry point
 │
-├── uploads/ # Local uploads (optional)
 │
 ├── .env # Environment variables
 ├── .gitignore

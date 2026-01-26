@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memora – Favorites</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+  </head>
+
+  <body data-page="favorites">
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside>
+        <div class="logo">STUMGT</div>
+
+        <nav>
+          <div
+            class="nav-item"
+            data-page="dashboard"
+            data-tooltip="Dashboard overview"
+            onclick="location.href = 'dashboard.html'"
+          >
+            <i class="ri-layout-grid-line"></i>Dashboard
+          </div>
+
+          <div
+            class="nav-item"
+            data-page="notes"
+            data-tooltip="All your notes"
+            onclick="location.href = 'notes.html'"
+          >
+            <i class="ri-sticky-note-line"></i>Notes
+          </div>
+
+          <div
+            class="nav-item"
+            data-page="favorites"
+            data-tooltip="Starred notes"
+          >
+            <i class="ri-star-line"></i>Favorites
+          </div>
+
+          <div
+            class="nav-item"
+            data-page="archive"
+            data-tooltip="Archived notes"
+            onclick="location.href = 'archive.html'"
+          >
+            <i class="ri-archive-line"></i>Archive
+          </div>
+
+          <div
+            class="nav-item"
+            data-page="bin"
+            data-tooltip="Deleted notes"
+            onclick="location.href = 'bin.html'"
+          >
+            <i class="ri-delete-bin-line"></i>Bin
+          </div>
+        </nav>
+
+        <!-- BOTTOM -->
+        <div class="nav-bottom">
+          <div
+            class="nav-item"
+            data-page="profile"
+            data-tooltip="Profile & settings"
+            onclick="location.href = 'profile.html'"
+          >
+            <i class="ri-user-3-line"></i>Profile
+          </div>
+
+          <div class="nav-item" id="themeToggle" data-tooltip="Toggle theme">
+            <i class="ri-moon-line"></i>Theme
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main>
+        <header>
+          <div>
+            <h1>Favorite Notes</h1>
+            <p class="subtitle">Your starred ideas</p>
+          </div>
+        </header>
+
+        <section id="notesGrid" class="notes-grid"></section>
+
+        <div id="emptyState" class="empty">
+          <h3>No favorites yet</h3>
+          <p class="quote">Star notes to find them quickly later.</p>
+        </div>
+      </main>
+
+      <!-- MODAL -->
+      <div id="noteModal" class="modal">
+        <div class="modal-box">
+          <h3>Edit Note</h3>
+          <input id="noteTitle" />
+          <textarea id="noteContent"></textarea>
+          <div class="modal-actions">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn primary" onclick="saveEdit()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        /* ACTIVE STATE */
+        const currentPage = document.body.dataset.page;
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          if (item.dataset.page === currentPage) {
+            item.classList.add("active");
+          }
+        });
+
+        /* THEME */
+        const savedTheme = localStorage.getItem("memora_theme");
+        if (savedTheme === "light") document.body.classList.add("light-theme");
+
+        document.getElementById("themeToggle").onclick = () => {
+          document.body.classList.toggle("light-theme");
+          localStorage.setItem(
+            "memora_theme",
+            document.body.classList.contains("light-theme") ? "light" : "dark",
+          );
+        };
+
+        /* FAVORITES LOGIC */
+        let notes = JSON.parse(localStorage.getItem("memora_notes") || "[]");
+        let editId = null;
+
+        const grid = document.getElementById("notesGrid");
+        const empty = document.getElementById("emptyState");
+        const modal = document.getElementById("noteModal");
+        const titleInput = document.getElementById("noteTitle");
+        const contentInput = document.getElementById("noteContent");
+
+        function render() {
+          const favs = notes.filter((n) => n.favorite && !n.deleted);
+          grid.innerHTML = "";
+
+          if (!favs.length) {
+            empty.style.display = "block";
+            return;
+          }
+
+          empty.style.display = "none";
+
+          favs.forEach((n) => {
+            const div = document.createElement("div");
+            div.className = "note";
+            div.innerHTML = `
+        <h4>${n.title}</h4>
+        <p>${n.content}</p>
+        <div class="note-actions">
+          <button onclick="toggleFavorite(${n.id})">
+            <i class="ri-star-fill"></i>
+          </button>
+          <button onclick="editNote(${n.id})">
+            <i class="ri-edit-line"></i>
+          </button>
+          <button onclick="moveToBin(${n.id})">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </div>
+      `;
+            grid.appendChild(div);
+          });
+        }
+
+        window.toggleFavorite = (id) => {
+          notes = notes.map((n) =>
+            n.id === id ? { ...n, favorite: false } : n,
+          );
+          persist();
+        };
+
+        window.moveToBin = (id) => {
+          notes = notes.map((n) => (n.id === id ? { ...n, deleted: true } : n));
+          persist();
+        };
+
+        window.editNote = (id) => {
+          const note = notes.find((n) => n.id === id);
+          editId = id;
+          titleInput.value = note.title;
+          contentInput.value = note.content;
+          modal.classList.add("active");
+        };
+
+        window.closeModal = () => modal.classList.remove("active");
+
+        window.saveEdit = () => {
+          notes = notes.map((n) =>
+            n.id === editId
+              ? { ...n, title: titleInput.value, content: contentInput.value }
+              : n,
+          );
+          closeModal();
+          persist();
+        };
+
+        function persist() {
+          localStorage.setItem("memora_notes", JSON.stringify(notes));
+          render();
+        }
+
+        render();
+      });
+    </script>
+
+    <style>
+      .note-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .note-actions button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        font-size: 18px;
+      }
+      .note-actions button:hover {
+        color: var(--text-primary);
+      }
+    </style>
+  </body>
+</html>

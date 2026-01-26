@@ -14,14 +14,18 @@ export const delBlocked = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    //check user blocked
-    if (user.isDeleted === "true") {
+    //check user deleted
+    if (user.isDeleted === true) {
       return res.status(401).json({ message: "User not found or deleted" });
     }
     //check user blocked
     if (user.status !== "active") {
-      return res.status(401).json({ message: "Your account is   blocked" });
+      return res
+        .status(401)
+        .json({ message: "Your account is blocked. Contact admin" });
     }
+
+    req.user = user;
     next();
   } catch (error) {
     console.log("error", error);

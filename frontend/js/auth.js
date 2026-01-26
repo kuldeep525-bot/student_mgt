@@ -75,7 +75,7 @@ if (loginForm) {
       }
 
       alert("Login Successfully");
-      window.location.href = "../dashboard.html";
+      window.location.href = "../pages/dashboard.html";
     } catch (error) {
       console.error("Login error:", error);
       alert("Something went wrong");
@@ -90,7 +90,6 @@ if (logingoogleAuth) {
   });
 }
 const logout = document.getElementById("logout");
-
 if (logout) {
   logout.addEventListener("click", async (e) => {
     e.preventDefault();
@@ -104,7 +103,7 @@ if (logout) {
 
       if (!response.ok) {
         alert(data?.message || "Logout failed");
-        window.location.href = "login.html";
+        window.location.href = "/frontend/public/login.html";
         return;
       }
 

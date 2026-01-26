@@ -31,10 +31,12 @@ export const register = async (req, res) => {
       role,
     });
 
-    res.status(201).json({ message: "User created successfully", dataStore });
+    return res
+      .status(201)
+      .json({ message: "User created successfully", dataStore });
   } catch (error) {
-    res.status(500).json({ message: "User not created" });
     console.log(error);
+    return res.status(500).json({ message: "User not created" });
   }
 };
 
@@ -54,6 +56,16 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid Credentials" });
     }
 
+    //check user deleted or not
+    if (userexits.isDeleted === true) {
+      return res.status(401).json({ message: "User is  deleted" });
+    }
+
+    //check user blocked or not
+    if (userexits.status === "blocked") {
+      return res.status(401).json({ message: "Your account is blocked" });
+    }
+
     const ismatch = await bcrypt.compare(password, userexits.password);
 
     if (!ismatch) {
@@ -61,7 +73,6 @@ export const login = async (req, res) => {
     }
 
     //using jwt Generation
-
     const token = jwt.sign(
       {
         userId: userexits._id,
@@ -70,6 +81,7 @@ export const login = async (req, res) => {
       SecretKey,
       { expiresIn: "1d" },
     );
+
     //setup cookie
     const cookiesOption = {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -79,7 +91,6 @@ export const login = async (req, res) => {
     };
 
     //store token in cookie
-
     res.cookie("jwt", token, cookiesOption);
 
     //success response
@@ -94,7 +105,7 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    return res.status(500).json({ message: "Server Error" });
     console.log(error);
   }
 };
@@ -111,5 +122,40 @@ export const logout = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "logout Error" });
     console.log(error);
+  }
+};
+
+export const Userdelete = async (req, res) => {
+  try {
+    //  userId JWT middleware se aata hai
+    const userId = req.userId;
+
+    //  user exist check
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // already deleted check
+    if (user.isDeleted) {
+      return res.status(400).json({ message: "User already deleted" });
+    }
+
+    user.isDeleted = true;
+    user.status = "inactive";
+    user.deletedAt = new Date();
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Account deleted successfully",
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Delete account error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

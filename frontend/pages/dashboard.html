@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Memora – Notes Dashboard</title>
+    <title>STUMGT – Notes Dashboard</title>
 
     <!-- Font -->
     <link
@@ -15,31 +15,43 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="./css/dashboard.css" />
+    <link rel="stylesheet" href="../css/dashboard.css" />
   </head>
 
   <body>
     <div class="app">
       <!-- SIDEBAR -->
       <aside>
-        <div class="logo">Memora</div>
+        <div class="logo">STUMGT</div>
 
         <nav>
-          <div class="nav-item active" data-tooltip="Dashboard overview">
+          <a href="#" class="nav-item active" data-tooltip="Dashboard overview">
             <i class="ri-layout-grid-line"></i>Dashboard
-          </div>
-          <div class="nav-item" data-tooltip="All your notes">
+          </a>
+
+          <a href="./notes.html" class="nav-item" data-tooltip="All your notes">
             <i class="ri-sticky-note-line"></i>Notes
-          </div>
-          <div class="nav-item" data-tooltip="Starred notes">
+          </a>
+
+          <a
+            href="./favorites.html"
+            class="nav-item"
+            data-tooltip="Starred notes"
+          >
             <i class="ri-star-line"></i>Favorites
-          </div>
-          <div class="nav-item" data-tooltip="Deleted notes">
+          </a>
+
+          <a href="./bin.html" class="nav-item" data-tooltip="Deleted notes">
             <i class="ri-delete-bin-line"></i>Bin
-          </div>
-          <div class="nav-item" data-tooltip="Archived notes">
+          </a>
+
+          <a
+            href="./archive.html"
+            class="nav-item"
+            data-tooltip="Archived notes"
+          >
             <i class="ri-archive-line"></i>Archive
-          </div>
+          </a>
         </nav>
 
         <div class="nav-bottom">

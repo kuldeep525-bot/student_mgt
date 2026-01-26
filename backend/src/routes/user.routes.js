@@ -1,15 +1,23 @@
 import express from "express";
-import { login, logout, register } from "../controllers/user.controller.js";
+import {
+  login,
+  logout,
+  register,
+  Userdelete,
+} from "../controllers/user.controller.js";
 import { registerValidations } from "../validations/auth.validators.js";
 import { validate } from "../middleware/validate.middleware.js";
 import jwt from "jsonwebtoken";
 import passport from "passport";
+import { authenticate } from "../middleware/jwt.middleware.js";
+import { delBlocked } from "../middleware/block.middleware.js";
 const SecretKey = "studentMangement@_525";
 const router = express.Router();
 
 router.post("/register", registerValidations, validate, register);
 router.post("/login", login);
 router.post("/logout", logout);
+router.delete("/user/delete", authenticate, delBlocked, Userdelete);
 
 //google auth
 
@@ -25,12 +33,17 @@ router.get(
   passport.authenticate("google", { session: false }),
   (req, res) => {
     const token = jwt.sign({ userId: req.user._id }, SecretKey, {
-      expiresIn: "7d",
+      expiresIn: "1d",
     });
 
-    res.redirect(
-      `http://localhost:5500/frontend/dashboard.html?token=${token}`,
-    );
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    res.redirect(`http://localhost:5500/frontend/pages/dashboard.html`);
   },
 );
 

@@ -30,12 +30,34 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+.ball {
+  position: fixed;
+  /* fixed so it follows the viewport */
+  top: 0;
+  left: 0;
+  height: 30px;
+  width: 30px;
+  border: 2px solid white;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease-out;
+  mix-blend-mode: difference;
+}
+
+html {
+  scroll-behavior: smooth;
   transition:
     background 0.4s ease,
     color 0.4s ease;
 }
 
 body {
+  cursor: default;
+  /* Optional: hide default cursor */
+  /* overflow: hidden; */
   font-family: "Inter", sans-serif;
   background: var(--bg-main);
   color: var(--text-primary);
@@ -585,4 +607,68 @@ body {
   }
 
   /* same-width buttons */
+}
+
+/* ================= FOOTER ================= */
+.app-footer {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-soft);
+  margin-top: auto;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.footer-left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--text-primary);
+}
+
+.footer-left strong {
+  font-weight: 600;
+}
+
+.footer-center {
+  display: flex;
+  gap: 16px;
+}
+
+.footer-center a {
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.footer-center a:hover {
+  color: var(--text-primary);
+}
+
+.footer-right {
+  white-space: nowrap;
+}
+
+
+
+
+/* ================= FOOTER RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-center {
+    order: 3;
+  }
 }

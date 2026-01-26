@@ -99,3 +99,35 @@ export const userUnblocked = async (req, res) => {
     return res.status(500).json({ message: "server internal error" });
   }
 };
+
+export const userRestor = async (req, res) => {
+  try {
+    //firstly hum userid lnga url me se
+
+    const { userId } = req.params;
+    //check karenga yeh id database hai yeh hi
+
+    const user = await User.findById(userId);
+    //user not find then return
+    if (!user) {
+      return res.status(404).json({ message: "user not find" });
+    }
+
+    if (!user.isDeleted) {
+      return res
+        .status(401)
+        .json({ message: "User already active not deleted" });
+    }
+
+    user.isDeleted = false;
+    user.status = "active";
+    user.deletedAt = null;
+
+    await user.save();
+
+    return res.status(200).json({ message: "user restore correctly", user });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "internal server error" });
+  }
+};

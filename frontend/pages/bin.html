@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memora – Bin</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+  </head>
+
+  <body data-page="bin">
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside>
+        <div class="logo">STUMGT</div>
+
+        <nav>
+          <div
+            class="nav-item"
+            data-page="dashboard"
+            data-tooltip="Dashboard overview"
+            onclick="location.href = 'dashboard.html'"
+          >
+            <i class="ri-layout-grid-line"></i>Dashboard
+          </div>
+          <div
+            class="nav-item"
+            data-page="notes"
+            data-tooltip="All your notes"
+            onclick="location.href = 'notes.html'"
+          >
+            <i class="ri-sticky-note-line"></i>Notes
+          </div>
+          <div
+            class="nav-item"
+            data-page="favorites"
+            data-tooltip="Starred notes"
+            onclick="location.href = 'favorites.html'"
+          >
+            <i class="ri-star-line"></i>Favorites
+          </div>
+          <div
+            class="nav-item"
+            data-page="archive"
+            data-tooltip="Archived notes"
+            onclick="location.href = 'archive.html'"
+          >
+            <i class="ri-archive-line"></i>Archive
+          </div>
+          <div class="nav-item" data-page="bin" data-tooltip="Deleted notes">
+            <i class="ri-delete-bin-line"></i>Bin
+          </div>
+        </nav>
+
+        <div class="nav-bottom">
+          <div
+            class="nav-item"
+            data-page="profile"
+            data-tooltip="Profile & settings"
+            onclick="location.href = 'profile.html'"
+          >
+            <i class="ri-user-3-line"></i>Profile
+          </div>
+          <div class="nav-item" id="themeToggle" data-tooltip="Toggle theme">
+            <i class="ri-moon-line"></i>Theme
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main>
+        <header>
+          <div>
+            <h1>Bin</h1>
+            <p class="subtitle">Restore or delete notes permanently</p>
+          </div>
+        </header>
+
+        <section id="notesGrid" class="notes-grid"></section>
+
+        <div id="emptyState" class="empty">
+          <h3>Bin is empty</h3>
+          <p class="quote">Deleted notes will appear here.</p>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        /* ACTIVE STATE */
+        const currentPage = document.body.dataset.page;
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          if (item.dataset.page === currentPage) {
+            item.classList.add("active");
+          }
+        });
+
+        /* THEME */
+        const savedTheme = localStorage.getItem("memora_theme");
+        if (savedTheme === "light") document.body.classList.add("light-theme");
+
+        document.getElementById("themeToggle").onclick = () => {
+          document.body.classList.toggle("light-theme");
+          localStorage.setItem(
+            "memora_theme",
+            document.body.classList.contains("light-theme") ? "light" : "dark",
+          );
+        };
+
+        /* BIN LOGIC */
+        let notes = JSON.parse(localStorage.getItem("memora_notes") || "[]");
+        const grid = document.getElementById("notesGrid");
+        const empty = document.getElementById("emptyState");
+
+        function render() {
+          const deleted = notes.filter((n) => n.deleted);
+          grid.innerHTML = "";
+
+          if (!deleted.length) {
+            empty.style.display = "block";
+            return;
+          }
+
+          empty.style.display = "none";
+
+          deleted.forEach((n) => {
+            const div = document.createElement("div");
+            div.className = "note";
+            div.innerHTML = `
+        <h4>${n.title}</h4>
+        <p>${n.content}</p>
+        <div class="note-actions">
+          <button onclick="restore(${n.id})"><i class="ri-arrow-go-back-line"></i></button>
+          <button onclick="removeForever(${n.id})"><i class="ri-close-circle-line"></i></button>
+        </div>
+      `;
+            grid.appendChild(div);
+          });
+        }
+
+        window.restore = (id) => {
+          notes = notes.map((n) =>
+            n.id === id ? { ...n, deleted: false } : n,
+          );
+          persist();
+        };
+
+        window.removeForever = (id) => {
+          notes = notes.filter((n) => n.id !== id);
+          persist();
+        };
+
+        function persist() {
+          localStorage.setItem("memora_notes", JSON.stringify(notes));
+          render();
+        }
+
+        render();
+      });
+    </script>
+  </body>
+</html>

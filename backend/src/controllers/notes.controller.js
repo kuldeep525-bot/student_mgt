@@ -39,7 +39,6 @@ export const GetNOTES = async (req, res) => {
     }
 
     if (note.UserNote.toString() !== userId) {
-      console.log(note.UserNote);
       return res
         .status(403)
         .json({ message: "Not authorized to access this note" });
@@ -129,7 +128,6 @@ export const DeleteNotes = async (req, res) => {
     }
 
     //agar hum user ki id or noteid se find out kar leta hai toh hum sirif user ko soft delte karenga
-
     SoftDelNotes.isDeleted = true;
     await SoftDelNotes.save();
 
