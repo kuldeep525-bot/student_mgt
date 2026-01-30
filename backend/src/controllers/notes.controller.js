@@ -33,7 +33,11 @@ export const GetNOTES = async (req, res) => {
   try {
     const userId = req.userId;
     const noteId = req.params.noteId;
-    const note = await Notes.findOne({ _id: noteId, isDeleted: false });
+    const note = await Notes.findOne({
+      _id: noteId,
+      isDeleted: false,
+      isArchived: false,
+    });
     if (!note) {
       return res.status(404).json({ message: "Notes Not found" });
     }
@@ -70,8 +74,13 @@ export const GetAllNOTES = async (req, res) => {
     const totalNotes = await Notes.countDocuments({
       UserNote: userId,
       isDeleted: false,
+      isArchived: false,
     });
-    const note = await Notes.find({ UserNote: userId, isDeleted: false })
+    const note = await Notes.find({
+      UserNote: userId,
+      isDeleted: false,
+      isArchived: false,
+    })
       .populate("UserNote", "name email")
       .skip(skip)
       .limit(limit)
@@ -136,7 +145,7 @@ export const DeleteNotes = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -156,6 +165,12 @@ export const UpdateNotes = async (req, res) => {
 
     if (!note) {
       return res.status(400).json({ message: "Note Not Found" });
+    }
+
+    if (note.isArchived) {
+      return res.status(400).json({
+        message: "Archived note cannot be updated",
+      });
     }
 
     //SIRIF OWNER HE UPDATE KAR SAKTE HAI
@@ -181,5 +196,165 @@ export const UpdateNotes = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const Archive = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { noteId } = req.params;
+
+    //validate objecId
+    if (!mongoose.Types.ObjectId.isValid(noteId)) {
+      return res.status(400).json({ message: "Invalid NoteID" });
+    }
+
+    const note = await Notes.findOne({
+      _id: noteId,
+      UserNote: userId,
+      isDeleted: false,
+      isArchived: false,
+    });
+
+    //  Note exist check
+    if (!note) {
+      return res.status(404).json({
+        message: "Note not found or already archived",
+      });
+    }
+
+    //sirif owner he archive kar sake
+
+    if (note.UserNote.toString() !== userId) {
+      return res.status(400).json({ message: "Acess Denied" });
+    }
+
+    note.isArchived = true;
+    await note.save();
+    res.status(200).json({
+      message: "Note Archive successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const UnArchive = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { noteId } = req.params;
+
+    //validate objecId
+    if (!mongoose.Types.ObjectId.isValid(noteId)) {
+      return res.status(400).json({ message: "Invalid NoteID" });
+    }
+
+    const note = await Notes.findOne({
+      _id: noteId,
+      UserNote: userId,
+      isDeleted: false,
+      isArchived: true,
+    });
+
+    //  Note exist check
+    if (!note) {
+      return res.status(404).json({
+        message: "Note not found or already archived",
+      });
+    }
+
+    //sirif owner he archive kar sake
+
+    if (note.UserNote.toString() !== userId) {
+      return res.status(400).json({ message: "Acess Denied" });
+    }
+
+    note.isArchived = false;
+    await note.save();
+    res.status(200).json({
+      message: "Note Archive successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const Favourite = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { noteId } = req.params;
+
+    //validate objecId
+    if (!mongoose.Types.ObjectId.isValid(noteId)) {
+      return res.status(400).json({ message: "Invalid NoteID" });
+    }
+
+    const note = await Notes.findOne({
+      _id: noteId,
+      UserNote: userId,
+      isDeleted: false,
+      isFavourite: false,
+    });
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    //sirif owner he archive kar sake
+
+    if (note.UserNote.toString() !== userId) {
+      return res.status(400).json({ message: "Acess Denied" });
+    }
+
+    note.isFavourite = true;
+    await note.save();
+
+    res.status(200).json({
+      message: "Note are selected as favourite",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const UnFavourite = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { noteId } = req.params;
+
+    //validate objecId
+    if (!mongoose.Types.ObjectId.isValid(noteId)) {
+      return res.status(400).json({ message: "Invalid NoteID" });
+    }
+
+    const note = await Notes.findOne({
+      _id: noteId,
+      UserNote: userId,
+      isDeleted: false,
+      isFavourite: true,
+    });
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    //sirif owner he archive kar sake
+
+    if (note.UserNote.toString() !== userId) {
+      return res.status(400).json({ message: "Acess Denied" });
+    }
+
+    note.isFavourite = false;
+    await note.save();
+
+    res.status(200).json({
+      message: "Note are selected as Unfavourite",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "server error" });
   }
 };

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  forgotPassword,
   login,
   logout,
   register,
@@ -18,6 +19,7 @@ router.post("/register", registerValidations, validate, register);
 router.post("/login", login);
 router.post("/logout", logout);
 router.delete("/user/delete", authenticate, delBlocked, Userdelete);
+router.post("/forgot", forgotPassword);
 
 //google auth
 

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "node:os";
 
 const NotesSchema = mongoose.Schema(
   {
@@ -16,6 +17,14 @@ const NotesSchema = mongoose.Schema(
       required: true,
     },
     isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
+    isFavourite: {
       type: Boolean,
       default: false,
     },

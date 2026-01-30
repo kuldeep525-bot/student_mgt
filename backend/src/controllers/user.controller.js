@@ -1,6 +1,8 @@
 import User from "../models/user.Model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { sendEmail } from "../../utils/sendEmail.js";
 const SecretKey = "studentMangement@_525";
 
 export const register = async (req, res) => {
@@ -159,3 +161,64 @@ export const Userdelete = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const forgotPassword = async (req, res) => {
+  try {
+    //first hum body se email lnga or verify karenga
+    const { email } = req.body;
+    //email validation
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(200)
+        .json({ message: "if this email exists,a reset link has been sent" }); //Email Enumeration Protection
+    }
+
+    //secure resettoken generate by crypto
+    const resetToken = crypto.randomBytes(32).toString("hex"); //32 bytes ka random secure token yeh token email me bhejna hai
+
+    //reset token jo ki ab hash hoga or voh database me save hoga
+
+    const hashToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    //save token in database and validate upto 10 minutes
+    user.resetToken = hashToken;
+    user.expiryToken = Date.now() + 10 * 60 * 1000; //valid upto 10 minutes
+
+    user.save({ validateBeforeSave: false }); //validation skip kar ka save
+
+    //now reset url banana
+    const resetUrl = `http://localhost:4000/api/auth/reset-password/${resetToken}`;
+
+    const message = `You requested a password reset to studentMgt.
+Click the link below:
+${resetUrl}
+This link will expire in 10 minutes.`;
+
+    //ab hum email bhjenga user ko
+
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset",
+      text: message,
+    });
+
+    //final response
+    res
+      .status(200)
+      .json({ message: "if this email exists,a reset link has been sent" });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const resetPassword = async (req, res) => {};

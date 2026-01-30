@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./config.js";
+import { API_BASE_URL } from "./config/api.js";
 
 //REGISTER
 const registerForm = document.getElementById("registerForm");
