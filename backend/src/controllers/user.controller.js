@@ -221,4 +221,49 @@ This link will expire in 10 minutes.`;
   }
 };
 
-export const resetPassword = async (req, res) => {};
+export const resetPassword = async (req, res) => {
+  try {
+    //token lna url se
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    //password validation
+    if (!password || !confirmPassword) {
+      return res.status(400).json({
+        message: "Password and confirm password are required",
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        message: "Passwords do not match",
+      });
+    }
+
+    //token ko hash karna kyu ki db me hash token store hai
+    const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    //valid user find out
+
+    const user = await User.findOne({
+      resetToken: hashToken,
+      expiryToken: { $gt: Date.now() },
+    });
+
+    //ab new password hash karo
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    //password update and token delete
+    user.password = hashedPassword;
+    user.resetToken = undefined; //token ko remove karna compulusry hai kyu ki ab koi bhi same link se nhi ja sakhta hai
+    user.expiryToken = undefined;
+
+    await user.save();
+    res.status(200).json({
+      message: "Password reset successful. Please login again.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
