@@ -6,6 +6,7 @@ import {
   Favourite,
   GetAllNOTES,
   GetNOTES,
+  RestoreNotes,
   UnArchive,
   UnFavourite,
   UpdateNotes,
@@ -19,10 +20,11 @@ const router = express.Router();
 router.post("/create", authenticate, delBlocked, notesValidations, createNotes);
 router.get("/getnotes/:noteId", authenticate, delBlocked, GetNOTES);
 router.get("/getallnotes", authenticate, delBlocked, GetAllNOTES);
-router.delete("/deletnote/:noteId", authenticate, delBlocked, DeleteNotes);
+router.patch("/deletenote/:noteId", authenticate, delBlocked, DeleteNotes);
+router.patch("/restorenote/:noteId", authenticate, delBlocked, RestoreNotes);
 router.put("/update/:noteId", authenticate, delBlocked, UpdateNotes);
-router.put("/archive/:noteId", authenticate, delBlocked, Archive);
-router.put("/unarchive/:noteId", authenticate, delBlocked, UnArchive);
-router.put("/favourite/:noteId", authenticate, delBlocked, Favourite);
-router.put("/unfavourite/:noteId", authenticate, delBlocked, UnFavourite);
+router.patch("/archive/:noteId", authenticate, delBlocked, Archive);
+router.patch("/unarchive/:noteId", authenticate, delBlocked, UnArchive);
+router.patch("/favourite/:noteId", authenticate, delBlocked, Favourite);
+router.patch("/unfavourite/:noteId", authenticate, delBlocked, UnFavourite);
 export default router;

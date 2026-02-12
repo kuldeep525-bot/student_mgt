@@ -149,6 +149,45 @@ export const DeleteNotes = async (req, res) => {
   }
 };
 
+export const RestoreNotes = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const noteId = req.params.noteId;
+
+    if (!mongoose.Types.ObjectId.isValid(noteId)) {
+      return res.status(400).json({ message: "Invalid NoteID" });
+    }
+
+    const SoftDelNotes = await Notes.findOne({
+      _id: noteId,
+      UserNote: userId,
+      isDeleted: true,
+    });
+
+    if (!SoftDelNotes) {
+      return res
+        .status(404)
+        .json({ message: "Note not found or already deleted" });
+    }
+
+    //sirif owner he restore kar sakhte hai
+    if (SoftDelNotes.UserNote.toString() !== userId) {
+      return res.status(400).json({ message: "Acess Denied" });
+    }
+
+    //agar hum user ki id or noteid se find out kar leta hai toh hum sirif user ko restore karenga
+    SoftDelNotes.isDeleted = false;
+    await SoftDelNotes.save();
+
+    res.status(200).json({
+      message: "Note restore successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const UpdateNotes = async (req, res) => {
   try {
     const userId = req.userId;
@@ -260,7 +299,7 @@ export const UnArchive = async (req, res) => {
     //  Note exist check
     if (!note) {
       return res.status(404).json({
-        message: "Note not found or already archived",
+        message: "Note not found or already Unarchived",
       });
     }
 
@@ -273,7 +312,7 @@ export const UnArchive = async (req, res) => {
     note.isArchived = false;
     await note.save();
     res.status(200).json({
-      message: "Note Archive successfully",
+      message: "Note UnArchive successfully",
     });
   } catch (error) {
     console.error(error);
@@ -296,13 +335,14 @@ export const Favourite = async (req, res) => {
       UserNote: userId,
       isDeleted: false,
       isFavourite: false,
+      isArchived: false,
     });
 
     if (!note) {
       return res.status(404).json({ message: "Note not found" });
     }
 
-    //sirif owner he archive kar sake
+    //sirif owner he favourite kar sake
 
     if (note.UserNote.toString() !== userId) {
       return res.status(400).json({ message: "Acess Denied" });
@@ -341,7 +381,7 @@ export const UnFavourite = async (req, res) => {
       return res.status(404).json({ message: "Note not found" });
     }
 
-    //sirif owner he archive kar sake
+    //sirif owner he unfavourite kar sake
 
     if (note.UserNote.toString() !== userId) {
       return res.status(400).json({ message: "Acess Denied" });
