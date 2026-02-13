@@ -12,7 +12,7 @@ export const authenticate = (req, res, next) => {
     //token verify
     const decode = jwt.verify(token, SecretKey);
     //attack userid from request
-    req.userId = decode.userId;
+    req.user = decode;
     next();
   } catch (error) {
     console.log(error);

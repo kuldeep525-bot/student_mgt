@@ -13,7 +13,7 @@ export const createNotes = async (req, res) => {
     const CreateNote = await Notes.create({
       title,
       content,
-      UserNote: req.userId, // userId middleware se aaya
+      UserNote: req.user.userId, // userId middleware se aaya
     });
 
     res.status(201).json({
@@ -31,21 +31,15 @@ export const createNotes = async (req, res) => {
 
 export const GetNOTES = async (req, res) => {
   try {
-    const userId = req.userId;
     const noteId = req.params.noteId;
     const note = await Notes.findOne({
       _id: noteId,
+      UserNote: req.user.userId,
       isDeleted: false,
       isArchived: false,
-    });
+    }).populate("UserNote", "name email");
     if (!note) {
       return res.status(404).json({ message: "Notes Not found" });
-    }
-
-    if (note.UserNote.toString() !== userId) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to access this note" });
     }
 
     res.status(200).json({ message: "Notes found successfully", note });
@@ -55,90 +49,43 @@ export const GetNOTES = async (req, res) => {
   }
 };
 
-export const GetAllNOTES = async (req, res) => {
+export const GetAllNotes = async (req, res) => {
   try {
-    //login userId
-    const userId = req.userId;
-    //pagination query parms(default value)
-    let page = Number(req.query.page) || 1; //url se jo bhi data ata hai voh sirf string ata hai toh huma conver karna page ise Number me
-    let limit = Number(req.query.limit) || 10;
-
-    //saftey checks
-
-    if (page < 1) page = 1;
-    if (limit < 1) limit = 10;
-    if (limit > 20) limit = 20;
-
-    //skip calcultion
-    const skip = (page - 1) * limit;
-    const totalNotes = await Notes.countDocuments({
-      UserNote: userId,
+    const notes = await Notes.find({
+      UserNote: req.user.userId,
       isDeleted: false,
       isArchived: false,
-    });
-    const note = await Notes.find({
-      UserNote: userId,
-      isDeleted: false,
-      isArchived: false,
-    })
-      .populate("UserNote", "name email")
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 }); // latest first;
+    }).sort({ createdAt: -1 });
 
-    const user = await User.findOne({ _id: userId, isDeleted: false });
-
-    const totalPages = Math.ceil(totalNotes / limit);
-    if (note.length == 0) {
-      return res.status(200).json({
-        message: "No Notes Found",
-        note: [],
-      });
-    }
-
-    res.status(200).json({
-      message: "Notes found successfully",
-      currentPage: page,
-      totalPages: totalPages,
-      totalNotes: totalNotes,
-      notes: note,
-      user,
+    return res.status(200).json({
+      success: true,
+      totalNotes: notes.length,
+      notes,
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 export const DeleteNotes = async (req, res) => {
   try {
-    const userId = req.userId;
     const noteId = req.params.noteId;
-
-    if (!mongoose.Types.ObjectId.isValid(noteId)) {
-      return res.status(400).json({ message: "Invalid NoteID" });
-    }
-
-    const SoftDelNotes = await Notes.findOne({
-      _id: noteId,
-      UserNote: userId,
-      isDeleted: false,
-    });
+    const SoftDelNotes = await Notes.findOneAndUpdate(
+      {
+        _id: noteId,
+        UserNote: req.user.userId,
+        isDeleted: false,
+      },
+      { isDeleted: true },
+      { new: true },
+    );
 
     if (!SoftDelNotes) {
       return res
         .status(404)
         .json({ message: "Note not found or already deleted" });
     }
-
-    //sirif owner he delete kar sakhte hai
-    if (SoftDelNotes.UserNote.toString() !== userId) {
-      return res.status(400).json({ message: "Acess Denied" });
-    }
-
-    //agar hum user ki id or noteid se find out kar leta hai toh hum sirif user ko soft delte karenga
-    SoftDelNotes.isDeleted = true;
-    await SoftDelNotes.save();
 
     res.status(200).json({
       message: "Note deleted successfully",
@@ -151,33 +98,20 @@ export const DeleteNotes = async (req, res) => {
 
 export const RestoreNotes = async (req, res) => {
   try {
-    const userId = req.userId;
     const noteId = req.params.noteId;
-
-    if (!mongoose.Types.ObjectId.isValid(noteId)) {
-      return res.status(400).json({ message: "Invalid NoteID" });
-    }
-
-    const SoftDelNotes = await Notes.findOne({
-      _id: noteId,
-      UserNote: userId,
-      isDeleted: true,
-    });
+    const SoftDelNotes = await Notes.findOneAndUpdate(
+      {
+        _id: noteId,
+        UserNote: req.user.userId,
+        isDeleted: true,
+      },
+      { isDeleted: false },
+      { new: true },
+    );
 
     if (!SoftDelNotes) {
-      return res
-        .status(404)
-        .json({ message: "Note not found or already deleted" });
+      return res.status(404).json({ message: "Note not found" });
     }
-
-    //sirif owner he restore kar sakhte hai
-    if (SoftDelNotes.UserNote.toString() !== userId) {
-      return res.status(400).json({ message: "Acess Denied" });
-    }
-
-    //agar hum user ki id or noteid se find out kar leta hai toh hum sirif user ko restore karenga
-    SoftDelNotes.isDeleted = false;
-    await SoftDelNotes.save();
 
     res.status(200).json({
       message: "Note restore successfully",
@@ -190,17 +124,20 @@ export const RestoreNotes = async (req, res) => {
 
 export const UpdateNotes = async (req, res) => {
   try {
-    const userId = req.userId;
     const noteId = req.params.noteId;
     const { title, content } = req.body;
-    //check this note Id is valid or not
-
-    if (!mongoose.Types.ObjectId.isValid(noteId)) {
-      return res.status(400).json({ message: "Invalid NoteID" });
-    }
 
     //NOTE EXISTS OR NOT
-    const note = await Notes.findById(noteId);
+    const note = await Notes.findOneAndUpdate(
+      {
+        _id: noteId,
+        UserNote: req.user.userId,
+        isArchived: false,
+        isDeleted: false,
+      },
+      { $set: { title, content } },
+      { new: true },
+    ).populate("UserNote", "name email");
 
     if (!note) {
       return res.status(400).json({ message: "Note Not Found" });
@@ -211,23 +148,6 @@ export const UpdateNotes = async (req, res) => {
         message: "Archived note cannot be updated",
       });
     }
-
-    //SIRIF OWNER HE UPDATE KAR SAKTE HAI
-
-    if (note.UserNote.toString() !== userId) {
-      return res.status(400).json({ message: "Acess Denied" });
-    }
-
-    if (!title && !content) {
-      return res.status(400).json({ message: "Nothing to update" });
-    }
-
-    //updated now
-
-    if (title) note.title = title;
-    if (content) note.content = content;
-
-    await note.save();
 
     //success response
 
@@ -240,20 +160,17 @@ export const UpdateNotes = async (req, res) => {
 
 export const Archive = async (req, res) => {
   try {
-    const userId = req.userId;
     const { noteId } = req.params;
 
-    //validate objecId
-    if (!mongoose.Types.ObjectId.isValid(noteId)) {
-      return res.status(400).json({ message: "Invalid NoteID" });
-    }
-
-    const note = await Notes.findOne({
-      _id: noteId,
-      UserNote: userId,
-      isDeleted: false,
-      isArchived: false,
-    });
+    const note = await Notes.findOneAndUpdate(
+      {
+        _id: noteId,
+        UserNote: req.user.userId,
+        isDeleted: false, //delete not cannot archive
+      },
+      { $set: { isArchived: true } },
+      { new: true },
+    );
 
     //  Note exist check
     if (!note) {
@@ -262,15 +179,7 @@ export const Archive = async (req, res) => {
       });
     }
 
-    //sirif owner he archive kar sake
-
-    if (note.UserNote.toString() !== userId) {
-      return res.status(400).json({ message: "Acess Denied" });
-    }
-
-    note.isArchived = true;
-    await note.save();
-    res.status(200).json({
+    return res.status(200).json({
       message: "Note Archive successfully",
     });
   } catch (error) {
@@ -281,38 +190,27 @@ export const Archive = async (req, res) => {
 
 export const UnArchive = async (req, res) => {
   try {
-    const userId = req.userId;
     const { noteId } = req.params;
 
-    //validate objecId
-    if (!mongoose.Types.ObjectId.isValid(noteId)) {
-      return res.status(400).json({ message: "Invalid NoteID" });
-    }
-
-    const note = await Notes.findOne({
-      _id: noteId,
-      UserNote: userId,
-      isDeleted: false,
-      isArchived: true,
-    });
+    const note = await Notes.findOneAndUpdate(
+      {
+        _id: noteId,
+        UserNote: req.user.userId,
+        isDeleted: false, //delete not cannot unarchive
+      },
+      { $set: { isArchived: false } },
+      { new: true },
+    );
 
     //  Note exist check
     if (!note) {
       return res.status(404).json({
-        message: "Note not found or already Unarchived",
+        message: "Note not found or already unarchived",
       });
     }
 
-    //sirif owner he archive kar sake
-
-    if (note.UserNote.toString() !== userId) {
-      return res.status(400).json({ message: "Acess Denied" });
-    }
-
-    note.isArchived = false;
-    await note.save();
-    res.status(200).json({
-      message: "Note UnArchive successfully",
+    return res.status(200).json({
+      message: "Note unArchive successfully",
     });
   } catch (error) {
     console.error(error);
@@ -322,37 +220,27 @@ export const UnArchive = async (req, res) => {
 
 export const Favourite = async (req, res) => {
   try {
-    const userId = req.userId;
     const { noteId } = req.params;
 
-    //validate objecId
-    if (!mongoose.Types.ObjectId.isValid(noteId)) {
-      return res.status(400).json({ message: "Invalid NoteID" });
-    }
+    const note = await Notes.findOneAndUpdate(
+      {
+        _id: noteId,
+        UserNote: req.user.userId,
+        isDeleted: false, //delete not cannotbe favourite
+      },
+      { $set: { isFavourite: true } },
+      { new: true },
+    );
 
-    const note = await Notes.findOne({
-      _id: noteId,
-      UserNote: userId,
-      isDeleted: false,
-      isFavourite: false,
-      isArchived: false,
-    });
-
+    //  Note exist check
     if (!note) {
-      return res.status(404).json({ message: "Note not found" });
+      return res.status(404).json({
+        message: "Note not found ",
+      });
     }
 
-    //sirif owner he favourite kar sake
-
-    if (note.UserNote.toString() !== userId) {
-      return res.status(400).json({ message: "Acess Denied" });
-    }
-
-    note.isFavourite = true;
-    await note.save();
-
-    res.status(200).json({
-      message: "Note are selected as favourite",
+    return res.status(200).json({
+      message: "Note favourite successfully",
     });
   } catch (error) {
     console.log(error);
@@ -362,36 +250,27 @@ export const Favourite = async (req, res) => {
 
 export const UnFavourite = async (req, res) => {
   try {
-    const userId = req.userId;
     const { noteId } = req.params;
 
-    //validate objecId
-    if (!mongoose.Types.ObjectId.isValid(noteId)) {
-      return res.status(400).json({ message: "Invalid NoteID" });
-    }
+    const note = await Notes.findOneAndUpdate(
+      {
+        _id: noteId,
+        UserNote: req.user.userId,
+        isDeleted: false, //delete not cannot undfavourite
+      },
+      { $set: { isFavourite: false } },
+      { new: true },
+    );
 
-    const note = await Notes.findOne({
-      _id: noteId,
-      UserNote: userId,
-      isDeleted: false,
-      isFavourite: true,
-    });
-
+    //  Note exist check
     if (!note) {
-      return res.status(404).json({ message: "Note not found" });
+      return res.status(404).json({
+        message: "Note not found or",
+      });
     }
 
-    //sirif owner he unfavourite kar sake
-
-    if (note.UserNote.toString() !== userId) {
-      return res.status(400).json({ message: "Acess Denied" });
-    }
-
-    note.isFavourite = false;
-    await note.save();
-
-    res.status(200).json({
-      message: "Note are selected as Unfavourite",
+    return res.status(200).json({
+      message: "Note Unfavourite successfully",
     });
   } catch (error) {
     console.log(error);

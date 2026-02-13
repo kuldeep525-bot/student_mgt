@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { type } from "node:os";
 
 const NotesSchema = mongoose.Schema(
   {
@@ -15,22 +14,32 @@ const NotesSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     isDeleted: {
       type: Boolean,
       default: false,
+      index: true,
     },
     isArchived: {
       type: Boolean,
       default: false,
+      index: true,
     },
     isFavourite: {
       type: Boolean,
       default: false,
+      index: true,
     },
   },
   { timestamps: true },
 );
+
+//compound index for main queries
+
+NotesSchema.index({ userNote: 1, isDeleted: 1 });
+NotesSchema.index({ userNote: 1, isArchived: 1 });
+NotesSchema.index({ userNote: 1, isFavourite: 1 });
 
 const Notes = mongoose.model("Notes", NotesSchema);
 

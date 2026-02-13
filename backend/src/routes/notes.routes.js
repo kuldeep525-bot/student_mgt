@@ -4,7 +4,7 @@ import {
   createNotes,
   DeleteNotes,
   Favourite,
-  GetAllNOTES,
+  GetAllNotes,
   GetNOTES,
   RestoreNotes,
   UnArchive,
@@ -19,7 +19,7 @@ const router = express.Router();
 
 router.post("/create", authenticate, delBlocked, notesValidations, createNotes);
 router.get("/getnotes/:noteId", authenticate, delBlocked, GetNOTES);
-router.get("/getallnotes", authenticate, delBlocked, GetAllNOTES);
+router.get("/getallnotes", authenticate, delBlocked, GetAllNotes);
 router.patch("/deletenote/:noteId", authenticate, delBlocked, DeleteNotes);
 router.patch("/restorenote/:noteId", authenticate, delBlocked, RestoreNotes);
 router.put("/update/:noteId", authenticate, delBlocked, UpdateNotes);

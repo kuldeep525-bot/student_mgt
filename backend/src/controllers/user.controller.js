@@ -33,12 +33,17 @@ export const register = async (req, res) => {
       role,
     });
 
-    return res
-      .status(201)
-      .json({ message: "User created successfully", dataStore });
+    return res.status(201).json({
+      message: "User created successfully",
+      dataStore: {
+        id: dataStore._id,
+        name: dataStore.name,
+        email: dataStore.email,
+      },
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "User not created" });
+    return res.status(500).json({ message: "server error" });
   }
 };
 
@@ -51,21 +56,21 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const userexits = await User.findOne({ email });
+    const userexits = await User.findOne({
+      email,
+      isDeleted: false,
+      status: { $ne: "blocked" }, //$ne means not equal
+    }).select("+password");
     //check user exists
+
+    console.log(userexits);
 
     if (!userexits) {
       return res.status(401).json({ message: "Invalid Credentials" });
     }
 
-    //check user deleted or not
-    if (userexits.isDeleted === true) {
-      return res.status(401).json({ message: "User is  deleted" });
-    }
-
-    //check user blocked or not
     if (userexits.status === "blocked") {
-      return res.status(401).json({ message: "Your account is blocked" });
+      return res.status(403).json({ message: "Blocked by admin" });
     }
 
     const ismatch = await bcrypt.compare(password, userexits.password);
@@ -79,6 +84,8 @@ export const login = async (req, res) => {
       {
         userId: userexits._id,
         role: userexits.role,
+        status: userexits.status,
+        isDeleted: userexits.isDeleted,
       },
       SecretKey,
       { expiresIn: "1d" },
@@ -107,8 +114,8 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log("error", error);
     return res.status(500).json({ message: "Server Error" });
-    console.log(error);
   }
 };
 
@@ -129,25 +136,20 @@ export const logout = async (req, res) => {
 
 export const Userdelete = async (req, res) => {
   try {
-    //  userId JWT middleware se aata hai
-    const userId = req.userId;
+    const user = await User.findOneAndUpdate(
+      { _id: req.user.userId, isDeleted: false },
+      {
+        isDeleted: true,
+        status: "inactive",
+      },
+      { new: true },
+    );
 
-    //  user exist check
-    const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ message: "User not found or already deleted" });
     }
-
-    // already deleted check
-    if (user.isDeleted) {
-      return res.status(400).json({ message: "User already deleted" });
-    }
-
-    user.isDeleted = true;
-    user.status = "inactive";
-    user.deletedAt = new Date();
-
-    await user.save();
 
     return res.status(200).json({
       message: "Account deleted successfully",

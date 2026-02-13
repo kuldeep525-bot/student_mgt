@@ -19,7 +19,7 @@ const router = express.Router();
 router.post("/register", registerValidations, validate, register);
 router.post("/login", login);
 router.post("/logout", logout);
-router.delete("/user/delete", authenticate, delBlocked, Userdelete);
+router.put("/user/delete", authenticate, delBlocked, Userdelete);
 router.post("/forgot", forgotPassword);
 router.post("/reset/:token", resetPassword);
 

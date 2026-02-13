@@ -13,10 +13,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
+      index: true,
     },
 
     password: {
       type: String,
+      select: false,
     },
 
     googleId: {
@@ -33,15 +35,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["active", "blocked", "inactive"],
       default: "active",
+      index: true,
     },
 
     isDeleted: {
       type: Boolean,
       default: false,
+      index: true,
     },
     resetToken: {
       type: String,
       default: "",
+      select: false,
     },
     expiryToken: {
       type: Date,
@@ -49,6 +54,8 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+userSchema.index({ isDeleted: 1, status: 1 });
 
 const User = model("User", userSchema);
 

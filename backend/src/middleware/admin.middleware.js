@@ -1,15 +1,6 @@
-import User from "../models/user.Model.js";
-
 export const adminOnly = async (req, res, next) => {
   try {
-    const userId = req.userId;
-
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized access" });
-    }
-
-    // Fetch user from DB
-    const user = await User.findById(userId);
+    const user = req.user;
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

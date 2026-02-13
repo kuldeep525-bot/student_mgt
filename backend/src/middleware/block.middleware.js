@@ -1,31 +1,18 @@
 //is middleware me blocked user or deleted user ko system se jana me rokenga
 
-import User from "../models/user.Model.js";
-
 export const delBlocked = async (req, res, next) => {
   try {
-    // userId comes from authenticate middleware (token already verified)
-    const userId = req.userId;
-
-    //check user exits or nhi with user id
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
     //check user deleted
-    if (user.isDeleted === true) {
+    if (req.user.isDeleted === true) {
       return res.status(401).json({ message: "User not found or deleted" });
     }
     //check user blocked
-    if (user.status !== "active") {
+    if (req.user.status !== "active") {
       return res
         .status(401)
         .json({ message: "Your account is blocked. Contact admin" });
     }
 
-    req.user = user;
     next();
   } catch (error) {
     console.log("error", error);
