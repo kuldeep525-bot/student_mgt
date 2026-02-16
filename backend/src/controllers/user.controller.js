@@ -63,8 +63,6 @@ export const login = async (req, res) => {
     }).select("+password");
     //check user exists
 
-    console.log(userexits);
-
     if (!userexits) {
       return res.status(401).json({ message: "Invalid Credentials" });
     }

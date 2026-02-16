@@ -21,6 +21,11 @@ const NotesSchema = mongoose.Schema(
       default: false,
       index: true,
     },
+    deletedAt: {
+      //yeh useful hai jab user delete karega toh uska time note karega
+      type: Date,
+      default: null,
+    },
     isArchived: {
       type: Boolean,
       default: false,
@@ -37,9 +42,9 @@ const NotesSchema = mongoose.Schema(
 
 //compound index for main queries
 
-NotesSchema.index({ userNote: 1, isDeleted: 1 });
-NotesSchema.index({ userNote: 1, isArchived: 1 });
-NotesSchema.index({ userNote: 1, isFavourite: 1 });
+NotesSchema.index({ UserNote: 1, isDeleted: 1 });
+NotesSchema.index({ UserNote: 1, isArchived: 1 });
+NotesSchema.index({ UserNote: 1, isFavourite: 1 });
 
 const Notes = mongoose.model("Notes", NotesSchema);
 

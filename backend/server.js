@@ -9,7 +9,7 @@ import adminRoutes from "./src/routes/admin.routes.js";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./src/config/googleAuth.js";
-
+import "./src/job/cleanup.job.js";
 const app = express();
 
 // const port = process.env.PORT || 8000;

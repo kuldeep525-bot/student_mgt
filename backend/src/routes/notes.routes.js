@@ -2,11 +2,14 @@ import express from "express";
 import {
   Archive,
   createNotes,
+  dashboard,
   DeleteNotes,
   Favourite,
   GetAllNotes,
   GetNOTES,
+  hardDelete,
   RestoreNotes,
+  smartNotes,
   UnArchive,
   UnFavourite,
   UpdateNotes,
@@ -20,7 +23,10 @@ const router = express.Router();
 router.post("/create", authenticate, delBlocked, notesValidations, createNotes);
 router.get("/getnotes/:noteId", authenticate, delBlocked, GetNOTES);
 router.get("/getallnotes", authenticate, delBlocked, GetAllNotes);
+router.get("/smartsearch", authenticate, delBlocked, smartNotes);
+router.get("/dashboard", authenticate, dashboard);
 router.patch("/deletenote/:noteId", authenticate, delBlocked, DeleteNotes);
+router.delete("/harddeletenote/:noteId", authenticate, hardDelete);
 router.patch("/restorenote/:noteId", authenticate, delBlocked, RestoreNotes);
 router.put("/update/:noteId", authenticate, delBlocked, UpdateNotes);
 router.patch("/archive/:noteId", authenticate, delBlocked, Archive);

@@ -68,6 +68,161 @@ export const GetAllNotes = async (req, res) => {
   }
 };
 
+export const smartNotes = async (req, res) => {
+  try {
+    const {
+      search,
+      archived,
+      favourite,
+      startDate,
+      endDate,
+      sort,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    // Pagination setup
+    const currentPage = Math.max(Number(page), 1);
+    const perPage = Math.min(Number(limit), 20);
+    const skip = (currentPage - 1) * perPage;
+
+    //default filter object
+    const filter = {};
+
+    // Base Conditions
+    filter.UserNote = req.user.userId; // Logged-in user ke notes
+    filter.isDeleted = false; // Soft deleted notes hide
+
+    //search
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { content: { $regex: search, $options: "i" } },
+      ];
+    }
+    //$or=mongo operator,$regex=partial match,$options: "i" → case-insensitive
+
+    //conditional filter
+    //archived filter
+    if (archived === "true") filter.isArchived = true;
+    if (archived === "false") filter.isArchived = false;
+
+    //  Favourite filter
+    if (favourite === "true") filter.isFavourite = true;
+    if (favourite === "false") filter.isFavourite = false;
+
+    //with startDate and endDate
+    if (startDate && endDate) {
+      filter.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    //  Sorting logic
+    let sortOption = { createdAt: -1 };
+    if (sort === "oldest") {
+      sortOption = { createdAt: 1 };
+    } else if (sort === "edited") {
+      sortOption = { updatedAt: -1 };
+    }
+
+    // Execute queries in parallel
+    const [notes, total] = await Promise.all([
+      Notes.find(filter).sort(sortOption).skip(skip).limit(perPage).lean(),
+
+      Notes.countDocuments(filter),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      currentPage,
+      totalPages: Math.ceil(total / perPage),
+      totalResults: total,
+      notes,
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const dashboard = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    //current month and new date
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const [
+      totalNotes,
+      archiveNotes,
+      deleteNotes,
+      favouriteNotes,
+      thisMonthNotes,
+    ] = await Promise.all([
+      // isliye humna promise.all ka use kiya hai:Saari queries ek saath database ko bhejta hai
+      // Faster response milta hai
+      //total active notes
+      Notes.countDocuments({
+        UserNote: userId,
+        isDeleted: false,
+      }),
+
+      //archived Notes
+
+      Notes.countDocuments({
+        UserNote: userId,
+        isArchived: true,
+        isDeleted: false,
+      }),
+
+      //deleted Notes
+      Notes.countDocuments({
+        UserNote: userId,
+        isDeleted: true,
+      }),
+
+      //favourite Notes
+      Notes.countDocuments({
+        UserNote: userId,
+        isFavourite: true,
+        isDeleted: false,
+      }),
+
+      Notes.countDocuments({
+        UserNote: userId,
+        isDeleted: false,
+        createdAt: {
+          $gte: monthStart,
+          $lte: monthEnd,
+        },
+      }),
+    ]);
+
+    //But countDocuments():
+    // Sirf number return karta hai
+    // Fast hota hai
+    // Memory efficient hota hai
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalNotes,
+        archiveNotes,
+        deleteNotes,
+        favouriteNotes,
+        thisMonthNotes,
+      },
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
 export const DeleteNotes = async (req, res) => {
   try {
     const noteId = req.params.noteId;
@@ -77,7 +232,7 @@ export const DeleteNotes = async (req, res) => {
         UserNote: req.user.userId,
         isDeleted: false,
       },
-      { isDeleted: true },
+      { isDeleted: true, deletedAt: new Date() },
       { new: true },
     );
 
@@ -93,6 +248,25 @@ export const DeleteNotes = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const hardDelete = async (req, res) => {
+  try {
+    const noteId = req.params.noteId;
+    const note = await Notes.findOneAndDelete({
+      _id: noteId,
+      UserNote: req.user.userId,
+      isDeleted: true, // only already soft-deleted notes
+    });
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+    return res.status(200).json({ message: "notes deleted permanetly" });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server error" });
   }
 };
 
