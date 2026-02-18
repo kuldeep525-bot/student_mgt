@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Notes from "../models/notes.model.js";
 import User from "../models/user.Model.js";
+import axios from "axios";
 
 export const createNotes = async (req, res) => {
   try {
@@ -26,6 +27,44 @@ export const createNotes = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Notes not created", error });
+  }
+};
+
+export const aiSummary = async (req, res) => {
+  try {
+    const noteId = req.params.noteId;
+    const note = await Notes.findOne({
+      _id: noteId,
+      UserNote: req.user.userId,
+      isDeleted: false,
+    });
+    if (!note) {
+      return res.status(404).json({ message: "Notes Not found" });
+    }
+
+    if (!note.content) {
+      return res.status(400).json({ error: "content is required" });
+    }
+
+    console.log("summary make in 2 minutes");
+
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    const aiResponse = await axios.post("http://localhost:11434/api/generate", {
+      model: "gemma3:1b",
+      prompt: `Summarize this note clearly and concisely:${note.content}`,
+      stream: false,
+    });
+
+    note.summary = aiResponse.data.response;
+    await note.save();
+
+    return res
+      .status(200)
+      .json({ message: "summary created", summary: aiResponse.data.response });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server  error" });
   }
 };
 

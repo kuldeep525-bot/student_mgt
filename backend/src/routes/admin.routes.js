@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  analyticsDashboard,
   getAllUser,
   userBlocked,
   userRestor,
@@ -31,5 +32,6 @@ router.patch(
 );
 
 router.patch("/users/:userId", authenticate, adminOnly, userRestor);
+router.get("/analytical", authenticate, adminOnly, analyticsDashboard);
 
 export default router;

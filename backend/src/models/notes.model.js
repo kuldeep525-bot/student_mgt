@@ -10,6 +10,10 @@ const NotesSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    summary: {
+      type: String,
+      default: "",
+    },
     UserNote: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

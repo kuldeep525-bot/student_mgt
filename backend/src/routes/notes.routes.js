@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  aiSummary,
   Archive,
   createNotes,
   dashboard,
@@ -25,6 +26,7 @@ router.get("/getnotes/:noteId", authenticate, delBlocked, GetNOTES);
 router.get("/getallnotes", authenticate, delBlocked, GetAllNotes);
 router.get("/smartsearch", authenticate, delBlocked, smartNotes);
 router.get("/dashboard", authenticate, dashboard);
+router.get("/summary/:noteId", authenticate, delBlocked, aiSummary);
 router.patch("/deletenote/:noteId", authenticate, delBlocked, DeleteNotes);
 router.delete("/harddeletenote/:noteId", authenticate, hardDelete);
 router.patch("/restorenote/:noteId", authenticate, delBlocked, RestoreNotes);

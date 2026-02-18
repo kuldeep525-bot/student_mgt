@@ -1,3 +1,4 @@
+import Notes from "../models/notes.model.js";
 import User from "../models/user.Model.js";
 
 export const getAllUser = async (req, res) => {
@@ -114,5 +115,97 @@ export const userRestor = async (req, res) => {
   } catch (error) {
     console.log("error", error);
     return res.status(500).json({ message: "internal server error" });
+  }
+};
+
+export const analyticsDashboard = async (req, res) => {
+  try {
+    // const notes = await Notes.find();
+    // const deletedNotes = notes.filter((deleted) => {
+    //   return deleted.isDeleted === true;
+    // });
+    // const user = await User.find();
+    // const activeUser = user.filter((act) => {
+    //   return act.status === "active";
+    // });
+    // return res.status(200).json({
+    //   user: { totalUser: user.length, activeUser: activeUser.length },
+    //   notes: { totalNotes: notes.length, deletedNotes: deletedNotes.length },
+    // });//hum yeh sab bhi kar sakhte hai prr yeh hamera data lna me slow ho jayega show hum mongodb ka countdown use karenga
+
+    const totalUsers = await User.countDocuments();
+    const activeUsers = await User.countDocuments({ status: "active" });
+    const inactiveUsers = await User.countDocuments({ status: "inactive" });
+    const blockedUsers = await User.countDocuments({ status: "blocked" });
+
+    //notes
+    const totalNotes = await Notes.countDocuments({ isDeleted: false });
+    const deletedNotes = await Notes.countDocuments({ isDeleted: true });
+    const archivedNotes = await Notes.countDocuments({ isArchived: true });
+    const favouriteNotes = await Notes.countDocuments({ isFavourite: true });
+
+    // MONTHLY USER GROWTH
+    const monthlyUserGrowth = await User.aggregate([
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          total: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ]);
+
+    // MONTHLY NOTES GROWTH
+
+    const monthlyNotesGrowth = await Notes.aggregate([
+      {
+        $match: { isDeleted: false },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          total: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      users: {
+        totalUsers,
+        activeUsers,
+        inactiveUsers,
+        blockedUsers,
+      },
+      notes: {
+        totalNotes,
+        deletedNotes,
+        archivedNotes,
+        favouriteNotes,
+      },
+      charts: {
+        monthlyUserGrowth,
+        monthlyNotesGrowth,
+      },
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server error" });
   }
 };
