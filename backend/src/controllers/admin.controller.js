@@ -1,5 +1,7 @@
 import Notes from "../models/notes.model.js";
 import User from "../models/user.Model.js";
+import { uploadOnCloudinary } from "../../utils/cloudnary.js";
+import Paper from "../models/paper.model.js";
 
 export const getAllUser = async (req, res) => {
   try {
@@ -207,5 +209,60 @@ export const analyticsDashboard = async (req, res) => {
   } catch (error) {
     console.log("error", error);
     return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const createPaper = async (req, res) => {
+  try {
+    const { title, subject, year, price } = req.body;
+
+    //  Basic validation
+    if (!title || !subject || !year) {
+      return res.status(400).json({
+        message: "Title, Subject and Year are required",
+      });
+    }
+
+    //  File check
+    if (!req.files?.questionPdf || !req.files?.answerPdf) {
+      return res.status(400).json({
+        message: "Both Question PDF and Answer PDF are required",
+      });
+    }
+
+    //  Get local file paths
+    const questionLocalPath = req.files.questionPdf[0].path;
+    const answerLocalPath = req.files.answerPdf[0].path;
+
+    //  Upload to Cloudinary
+    const questionUpload = await uploadOnCloudinary(questionLocalPath);
+    const answerUpload = await uploadOnCloudinary(answerLocalPath);
+
+    if (!questionUpload || !answerUpload) {
+      return res.status(500).json({
+        message: "File upload failed",
+      });
+    }
+
+    //  Create Paper in DB
+    const paper = await Paper.create({
+      title,
+      subject,
+      year,
+      price,
+      questionPdf: questionPdf.secure_url,
+      answerPdf: answerPdf.secure_url,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Paper uploaded successfully",
+      data: paper,
+    });
+  } catch (error) {
+    console.error("Create Paper Error:", error);
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 };

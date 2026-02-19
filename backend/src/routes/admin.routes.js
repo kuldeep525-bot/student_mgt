@@ -1,6 +1,7 @@
 import express from "express";
 import {
   analyticsDashboard,
+  createPaper,
   getAllUser,
   userBlocked,
   userRestor,
@@ -9,6 +10,7 @@ import {
 import { adminOnly } from "../middleware/admin.middleware.js";
 import { authenticate } from "../middleware/jwt.middleware.js";
 import { delBlocked } from "../middleware/block.middleware.js";
+import { upload } from "../middleware/multer.middleware.js";
 
 const router = express.Router();
 
@@ -33,5 +35,16 @@ router.patch(
 
 router.patch("/users/:userId", authenticate, adminOnly, userRestor);
 router.get("/analytical", authenticate, adminOnly, analyticsDashboard);
+
+router.post(
+  "/create",
+  authenticate,
+  adminOnly,
+  upload.fields([
+    { name: "questionPdf", maxCount: 1 },
+    { name: "answerPdf", maxCount: 1 },
+  ]),
+  createPaper,
+);
 
 export default router;

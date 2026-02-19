@@ -51,6 +51,12 @@ const userSchema = new mongoose.Schema(
     expiryToken: {
       type: Date,
     },
+    purchasedPapers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Paper",
+      },
+    ],
   },
   { timestamps: true },
 );
