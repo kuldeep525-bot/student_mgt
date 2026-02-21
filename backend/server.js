@@ -10,12 +10,15 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./src/config/googleAuth.js";
 import "./src/job/cleanup.job.js";
+import { initCloudinary } from "./utils/cloudnary.js";
+
 const app = express();
 
 // const port = process.env.PORT || 8000;
 const port = 4000;
 
 await connectdb();
+initCloudinary();
 
 //corse ka middleware
 app.use(

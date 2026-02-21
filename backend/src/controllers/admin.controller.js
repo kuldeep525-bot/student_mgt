@@ -250,8 +250,8 @@ export const createPaper = async (req, res) => {
       subject,
       year,
       price,
-      questionPdf: questionPdf.secure_url,
-      answerPdf: answerPdf.secure_url,
+      questionPdf: questionUpload.secure_url,
+      answerPdf: answerUpload.secure_url,
     });
 
     res.status(201).json({
