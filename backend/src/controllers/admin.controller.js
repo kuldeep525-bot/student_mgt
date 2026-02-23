@@ -266,3 +266,74 @@ export const createPaper = async (req, res) => {
     });
   }
 };
+
+export const deletePaper = async (req, res) => {
+  try {
+    const paperId = req.params.paperId;
+    const paper = await Paper.findOneAndUpdate(
+      {
+        _id: paperId,
+        isActive: true,
+        isDeleted: false,
+      },
+      { isDeleted: true, isActive: false },
+      { new: true },
+    );
+
+    if (!paper) {
+      return res
+        .status(404)
+        .json({ message: "paper not found or already deleted" });
+    }
+
+    return res.status(200).json({ message: "Paper deleted successfully" });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const RestorePaper = async (req, res) => {
+  try {
+    const paperId = req.params.paperId;
+    const paper = await Paper.findOneAndUpdate(
+      {
+        _id: paperId,
+        isActive: false,
+        isDeleted: true,
+      },
+      { isDeleted: false, isActive: true },
+      { new: true },
+    );
+
+    if (!paper) {
+      return res
+        .status(404)
+        .json({ message: "paper not found or already restore" });
+    }
+
+    return res.status(200).json({ message: "Paper restore successfully" });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const hardDeletePaper = async (req, res) => {
+  try {
+    const paperId = req.params.paperId;
+    const paper = await Paper.findOneAndDelete({
+      _id: paperId,
+      isActive: false,
+      isDeleted: true,
+    });
+
+    if (!paper) {
+      return res.status(404).json({ message: "paper not found" });
+    }
+    return res.status(200).json({ message: "paper deleted permanetly" });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ message: "server error" });
+  }
+};

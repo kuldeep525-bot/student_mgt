@@ -1,8 +1,6 @@
 import express from "express";
 import {
   forgotPassword,
-  getPaper,
-  getSinglePaper,
   login,
   logout,
   register,
@@ -21,11 +19,9 @@ const router = express.Router();
 router.post("/register", registerValidations, validate, register);
 router.post("/login", login);
 router.post("/logout", logout);
-router.put("/user/delete", authenticate, delBlocked, Userdelete);
+router.patch("/user/delete", authenticate, delBlocked, Userdelete);
 router.post("/forgot", forgotPassword);
 router.post("/reset/:token", resetPassword);
-router.get("/getAllPaper", authenticate, delBlocked, getPaper);
-router.get("/getPaper/:paperId", authenticate, delBlocked, getSinglePaper);
 
 //google auth
 

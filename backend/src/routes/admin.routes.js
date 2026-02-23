@@ -2,7 +2,10 @@ import express from "express";
 import {
   analyticsDashboard,
   createPaper,
+  deletePaper,
   getAllUser,
+  hardDeletePaper,
+  RestorePaper,
   userBlocked,
   userRestor,
   userUnblocked,
@@ -10,6 +13,7 @@ import {
 import { adminOnly } from "../middleware/admin.middleware.js";
 import { authenticate } from "../middleware/jwt.middleware.js";
 import { delBlocked } from "../middleware/block.middleware.js";
+
 import { upload } from "../middleware/multer.middleware.js";
 
 const router = express.Router();
@@ -37,7 +41,7 @@ router.patch("/users/:userId", authenticate, adminOnly, userRestor);
 router.get("/analytical", authenticate, adminOnly, analyticsDashboard);
 
 router.post(
-  "/create",
+  "/paper/create",
   authenticate,
   adminOnly,
   upload.fields([
@@ -45,6 +49,20 @@ router.post(
     { name: "answerPdf", maxCount: 1 },
   ]),
   createPaper,
+);
+
+router.patch("/paper/delete/:paperId", authenticate, adminOnly, deletePaper);
+router.patch(
+  "/paper/restorePaper/:paperId",
+  authenticate,
+  adminOnly,
+  RestorePaper,
+);
+router.delete(
+  "/paper/harddelete/:paperId",
+  authenticate,
+  adminOnly,
+  hardDeletePaper,
 );
 
 export default router;

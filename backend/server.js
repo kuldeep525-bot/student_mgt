@@ -6,6 +6,7 @@ import connectdb from "./src/config/db.js";
 import authRoutes from "./src/routes/user.routes.js";
 import notesRoutes from "./src/routes/notes.routes.js";
 import adminRoutes from "./src/routes/admin.routes.js";
+import paperRoutes from "./src/routes/paper.routes.js";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./src/config/googleAuth.js";
@@ -38,7 +39,8 @@ app.use(cookieParser());
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
-app.use("/api/v2/admin", adminRoutes);
+app.use("/api/paper", paperRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("First");
