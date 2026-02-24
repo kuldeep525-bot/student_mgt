@@ -97,13 +97,12 @@ export const downloadQuestionPdf = async (req, res) => {
 
 export const downloadAnswer = async (req, res) => {
   try {
-    const paperId = req.params.paperId;
+    const { paperId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(paperId)) {
       return res.status(400).json({ message: "Invalid paper ID" });
     }
 
-    //  Find Paper
     const paper = await Paper.findOne({
       _id: paperId,
       isActive: true,
@@ -114,14 +113,8 @@ export const downloadAnswer = async (req, res) => {
       return res.status(404).json({ message: "Paper not found" });
     }
 
-    //  Get Fresh User from DB
     const user = await User.findById(req.user.userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // 4 Check Purchase
     const hasPurchased = user.purchasedPapers.some(
       (id) => id.toString() === paperId,
     );
@@ -132,51 +125,78 @@ export const downloadAnswer = async (req, res) => {
       });
     }
 
-    //  If Purchased → Redirect to Answer PDF
-    // return res.redirect(paper.answerPdf);
-    return res.status(200).json("purchased paper successfully");
+    return res.redirect(paper.answerPdf);
   } catch (error) {
-    console.log("Download Answer Error:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
 
-export const fakePurchase = async (req, res) => {
+export const generateUpiLink = async (req, res) => {
   try {
-    const { paperId } = req.params;
-
-    //  Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(paperId)) {
-      return res.status(400).json({ message: "Invalid paper ID" });
-    }
-
-    //  Check if paper exists
-    const paper = await Paper.findOne({
-      _id: paperId,
-      isActive: true,
-      isDeleted: false,
-    });
+    const paperId = req.params.paperId;
+    const paper = await Paper.findById(paperId);
 
     if (!paper) {
       return res.status(404).json({ message: "Paper not found" });
     }
 
-    //  Add paper to user's purchasedPapers
-    const user = await User.findByIdAndUpdate(
-      req.user.userId,
-      {
-        $addToSet: { purchasedPapers: paperId }, // prevents duplicates
-      },
-      { new: true },
-    );
+    const upiId = "9779781674@fam";
+    const name = "Kuldeep kumar";
+    //upi link created
+    const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+      name,
+    )}&am=${paper.price}&cu=INR&tn=${encodeURIComponent(
+      `Purchase ${paper.title}`,
+    )}`;
 
     return res.status(200).json({
       success: true,
-      message: "Paper purchased successfully (fake)",
-      purchasedPapers: user.purchasedPapers,
+      upiLink,
+      amount: paper.price,
+      paperTitle: paper.title,
     });
   } catch (error) {
-    console.log("Fake Purchase Error:", error);
+    console.log("UPI Link Error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const submitUpiTransaction = async (req, res) => {
+  try {
+    const { paperId, transactionId } = req.body;
+
+    if (!transactionId) {
+      return res.status(400).json({ message: "Transaction ID required" });
+    }
+
+    const user = await User.findById(req.user.userId);
+
+    const alreadyExists = user.pendingPayments.find(
+      (p) => p.transactionId === transactionId,
+    );
+
+    if (alreadyExists) {
+      return res.status(400).json({ message: "Transaction already submitted" });
+    }
+
+    //pendingPayments array ke andar ek naya record add:
+    // kaunsa paper
+    // kya transactionId
+    // status = "pending" (abhi admin ne verify nahi kiya)
+    user.pendingPayments.push({
+      paper: paperId,
+      transactionId,
+      status: "pending",
+    });
+
+    // Duplicate Transaction ID Block Karo
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Transaction submitted. Waiting for admin approval.",
+    });
+  } catch (error) {
     return res.status(500).json({ message: "Server error" });
   }
 };

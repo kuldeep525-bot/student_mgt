@@ -2,6 +2,7 @@ import Notes from "../models/notes.model.js";
 import User from "../models/user.Model.js";
 import { uploadOnCloudinary } from "../../utils/cloudnary.js";
 import Paper from "../models/paper.model.js";
+import { sendEmail } from "../../utils/sendEmail.js";
 
 export const getAllUser = async (req, res) => {
   try {
@@ -335,5 +336,57 @@ export const hardDeletePaper = async (req, res) => {
   } catch (error) {
     console.log("error", error);
     return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const approveUpiPayment = async (req, res) => {
+  try {
+    const { userId, paperId } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const paper = await Paper.findById(paperId);
+    if (!paper) {
+      return res.status(404).json({ message: "Paper not found" });
+    }
+
+    // Duplicate unlock se bachao
+    if (!user.purchasedPapers.includes(paperId)) {
+      user.purchasedPapers.push(paperId);
+    }
+
+    user.pendingPayments = user.pendingPayments.map((p) => {
+      if (p.paper.toString() === paperId) {
+        p.status = "approved";
+      }
+      return p;
+    });
+
+    await user.save();
+
+    await sendEmail({
+      to: user.email,
+      subject: "Payment Approved – Paper Unlocked ",
+      text: `Hi ${user.name || "there"},
+      
+Your payment has been approved by admin.
+
+Paper: ${paper.title}
+
+You can now login and download your paper.
+
+Thanks,
+StudentMgt Team`,
+    });
+
+    return res.status(200).json({
+      message: "Payment approved, paper unlocked & email sent",
+    });
+  } catch (error) {
+    console.log("Approve Error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

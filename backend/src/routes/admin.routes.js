@@ -1,6 +1,7 @@
 import express from "express";
 import {
   analyticsDashboard,
+  approveUpiPayment,
   createPaper,
   deletePaper,
   getAllUser,
@@ -64,5 +65,6 @@ router.delete(
   adminOnly,
   hardDeletePaper,
 );
+router.post("/paper/approvUpi", authenticate, adminOnly, approveUpiPayment);
 
 export default router;

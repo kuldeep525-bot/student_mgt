@@ -51,10 +51,29 @@ const userSchema = new mongoose.Schema(
     expiryToken: {
       type: Date,
     },
+    //yeh purchasedPaper jab used hoga jab user koi paper kardiga toh us paper ki id store hogi
     purchasedPapers: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Paper",
+      },
+    ],
+    //Ye tab use hota hai jab:
+    // User UPI se payment karta hai
+    // hum manually check karte ho
+    // Fir approve ya reject karte ho
+    pendingPayments: [
+      {
+        paper: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Paper",
+        },
+        transactionId: String,
+        status: {
+          type: String,
+          enum: ["pending", "approved", "rejected"],
+          default: "pending",
+        },
       },
     ],
   },
