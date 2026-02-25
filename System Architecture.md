@@ -30,6 +30,8 @@
 https://excalidraw.com/#json=-cIcHmbiqq5eCAxJGenwi,ErFFFsBhFtIf4kxAHgg7RQ
 ```
 
+# Admin dashboard design
+
 - Behaviriol logic diagram
   <img width="1360" height="682" alt="image" src="https://github.com/user-attachments/assets/afba726c-6b42-42fd-8328-a1ebca550547" />
 
