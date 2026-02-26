@@ -2,6 +2,7 @@
 
 ### folder structure :version 1
 
+```
 │
 ├── src/
 │ ├── config/
@@ -31,6 +32,7 @@
 
 ### version 2
 
+```
 student-management-backend/
 │
 ├── src/
