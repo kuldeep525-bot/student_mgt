@@ -1,4 +1,10 @@
-import nodemailer from "nodemailer";
+//Nodemailer details
+// SMTP server se connect karti hai
+// Email send karne ka easy interface deti hai
+// Attachments support karti hai
+// HTML emails support karti hai
+// Production ready hai
+// import nodemailer from "nodemailer";
 
 export const sendEmail = async ({ to, subject, text }) => {
   //Transporter = postman , yeh decide karta hai konse email server or kaise authentication
@@ -19,5 +25,3 @@ export const sendEmail = async ({ to, subject, text }) => {
     text,
   });
 };
-
-

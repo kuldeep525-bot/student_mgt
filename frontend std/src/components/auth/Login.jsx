@@ -1,89 +1,75 @@
 import axios from "axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../utils/constants";
+import { NotesContext } from "../../context/NotesContext";
+import { toast } from "react-toastify";
+import { showError, showSuccess } from "../../utils/toast";
 
 export const Login = () => {
+  const { verifyUser } = useContext(NotesContext);
   const [email, setEmail] = useState("");
-  const navigate = useNavigate();
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = async () => {
-        if (!email || !password) {
-      return alert("Email and password required");
-    }
+ const handleLogin = async () => {
+  if (!email || !password) {
+    toast.warning("Email and password required");
+    return;
+  }
+  try {
+  const res =  await axios.post(
+      BASE_URL + "/api/auth/login",
+      { email, password },
+      { withCredentials: true }
+    );
+    showSuccess("Login successful");
+    
+    await verifyUser();
+    console.log(res)
 
-    try {
-      const res = await axios.post(
-        BASE_URL + "/api/auth/login",
-        { email, password },
-        {
-          withCredentials: true,
-        },
-      );
-      alert(res.data.message);
-      navigate("/dashboard");
-    } catch (error) {
-      alert(error.response?.data?.message || "Login failed");
-    }
-  };
+    navigate("/dashboard", { replace: true });
 
+  } catch (error) {
+    console.log(error.message)
+    showError(
+      error.response?.data?.message || "Login failed"
+    );
+  }
+};
   return (
-    <div
-      data-theme="forest"
-      className="min-h-screen flex items-center justify-center bg-base-200 px-4"
-    >
+    <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
       <div className="w-full max-w-md bg-base-100 p-8 rounded-2xl shadow-xl">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold">Welcome Back</h1>
-          <p className="text-sm opacity-70 mt-1">
-            Login to access your dashboard
-          </p>
-        </div>
+        <h1 className="text-3xl font-bold mb-6 text-center">Welcome Back</h1>
 
         <div className="space-y-4">
-          <div>
-            <label className="label">
-              <span className="label-text">Email</span>
-            </label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(() => e.target.value)}
-              className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input input-bordered w-full"
+          />
 
-          <div>
-            <label className="label">
-              <span className="label-text">Password</span>
-            </label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => {
-                setPassword(() => e.target.value);
-              }}
-              className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input input-bordered w-full"
+          />
 
-          <button
-            onClick={() => handleLogin()}
-            className="btn btn-primary w-full mt-2"
-          >
+          <button onClick={handleLogin} className="btn btn-primary w-full">
             Login
           </button>
         </div>
 
-        <div className="text-center mt-6 text-sm opacity-70">
+        <p className="text-sm text-center mt-6 opacity-70">
           Don’t have an account?{" "}
-          <span className="link link-primary cursor-pointer">
-            <Link to={"/signup"}>Sign up</Link>
-          </span>
-        </div>
+          <Link to="/signup" className="link link-primary">
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );

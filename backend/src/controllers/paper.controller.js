@@ -140,8 +140,8 @@ export const generateUpiLink = async (req, res) => {
       return res.status(404).json({ message: "Paper not found" });
     }
 
-    const upiId = "9779781674@fam";
-    const name = "Kuldeep kumar";
+    const upiId = "9877230459@fam";
+    const name = "nitin Rawat";
     //upi link created
     const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
       name,

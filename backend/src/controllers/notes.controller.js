@@ -46,9 +46,9 @@ export const aiSummary = async (req, res) => {
       return res.status(400).json({ error: "content is required" });
     }
 
-    console.log("summary make in 2 minutes");
+    console.log("summary make in 1 minutes");
 
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, 60000));
 
     const aiResponse = await axios.post("http://localhost:11434/api/generate", {
       model: "gemma3:1b",
@@ -186,11 +186,90 @@ export const smartNotes = async (req, res) => {
   }
 };
 
+// export const dashboard = async (req, res) => {
+//   try {
+//     const userId = req.user.userId;
+
+//     //current month and new date
+//     const now = new Date();
+//     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+//     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+//     const [
+//       totalNotes,
+//       archiveNotes,
+//       deleteNotes,
+//       favouriteNotes,
+//       thisMonthNotes,
+//     ] = await Promise.all([
+//       // isliye humna promise.all ka use kiya hai:Saari queries ek saath database ko bhejta hai
+//       // Faster response milta hai
+//       //total active notes
+//       Notes.countDocuments({
+//         UserNote: userId,
+//         isDeleted: false,
+//       }),
+
+//       //archived Notes
+
+//       Notes.countDocuments({
+//         UserNote: userId,
+//         isArchived: true,
+//         isDeleted: false,
+//       }),
+
+//       //deleted Notes
+//       Notes.countDocuments({
+//         UserNote: userId,
+//         isDeleted: true,
+//       }),
+
+//       //favourite Notes
+//       Notes.countDocuments({
+//         UserNote: userId,
+//         isFavourite: true,
+//         isDeleted: false,
+//       }),
+
+//       Notes.countDocuments({
+//         UserNote: userId,
+//         isDeleted: false,
+//         createdAt: {
+//           $gte: monthStart,
+//           $lte: monthEnd,
+//         },
+//       }),
+//     ]);
+
+//     //But countDocuments():
+//     // Sirf number return karta hai
+//     // Fast hota hai
+//     // Memory efficient hota hai
+
+//     return res.status(200).json({
+//       success: true,
+//       data: {
+//         totalNotes,
+//         archiveNotes,
+//         deleteNotes,
+//         favouriteNotes,
+//         thisMonthNotes,
+//       },
+//       userInfo: {
+//         name: req.user.userName,
+//         id: userId,
+//       },
+//     });
+//   } catch (error) {
+//     console.log("error", error);
+//     return res.status(500).json({ message: "server error" });
+//   }
+// };
+
 export const dashboard = async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    //current month and new date
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -201,16 +280,12 @@ export const dashboard = async (req, res) => {
       deleteNotes,
       favouriteNotes,
       thisMonthNotes,
+      monthlyStatsRaw,
     ] = await Promise.all([
-      // isliye humna promise.all ka use kiya hai:Saari queries ek saath database ko bhejta hai
-      // Faster response milta hai
-      //total active notes
       Notes.countDocuments({
         UserNote: userId,
         isDeleted: false,
       }),
-
-      //archived Notes
 
       Notes.countDocuments({
         UserNote: userId,
@@ -218,13 +293,11 @@ export const dashboard = async (req, res) => {
         isDeleted: false,
       }),
 
-      //deleted Notes
       Notes.countDocuments({
         UserNote: userId,
         isDeleted: true,
       }),
 
-      //favourite Notes
       Notes.countDocuments({
         UserNote: userId,
         isFavourite: true,
@@ -239,12 +312,47 @@ export const dashboard = async (req, res) => {
           $lte: monthEnd,
         },
       }),
+
+      // Monthly Graph Aggregation (last 6 months)
+      Notes.aggregate([
+        {
+          $match: {
+            UserNote: userId,
+            isDeleted: false,
+          },
+        },
+        {
+          $group: {
+            _id: { $month: "$createdAt" },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+      ]),
     ]);
 
-    //But countDocuments():
-    // Sirf number return karta hai
-    // Fast hota hai
-    // Memory efficient hota hai
+    // Convert month number → month name
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const monthlyStats = monthlyStatsRaw.map((item) => ({
+      month: months[item._id - 1],
+      count: item.count,
+    }));
 
     return res.status(200).json({
       success: true,
@@ -254,6 +362,7 @@ export const dashboard = async (req, res) => {
         deleteNotes,
         favouriteNotes,
         thisMonthNotes,
+        monthlyStats, // 🔥 graph data
       },
     });
   } catch (error) {

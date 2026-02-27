@@ -81,6 +81,7 @@ export const login = async (req, res) => {
     //using jwt Generation
     const token = jwt.sign(
       {
+        userName: userexits.name,
         userId: userexits._id,
         role: userexits.role,
         status: userexits.status,

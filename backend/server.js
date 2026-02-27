@@ -42,10 +42,6 @@ app.use("/api/notes", notesRoutes);
 app.use("/api/paper", paperRoutes);
 app.use("/api/admin", adminRoutes);
 
-app.get("/", (req, res) => {
-  res.send("First");
-});
-
 app.listen(port, () => {
   console.log("app running at port :", port);
 });
