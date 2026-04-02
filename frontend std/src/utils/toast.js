@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 
+// custom toast hooks
 export const showSuccess = (message) =>
   toast.success(message);
 
