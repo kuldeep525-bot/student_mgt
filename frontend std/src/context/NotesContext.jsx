@@ -17,7 +17,7 @@ const NotesProvider = ({ children }) => {
   });
 
   /* ================= VERIFY USER ================= */
-
+// verify first user
   const verifyUser = async () => {
     try {
       const res = await api.get("/api/auth/me");
@@ -141,7 +141,7 @@ const NotesProvider = ({ children }) => {
       console.log(error);
     }
   };
-
+// pass props
   return (
     <NotesContext.Provider
       value={{
