@@ -20,11 +20,14 @@ It also includes an **Admin Dashboard** to manage users, papers, and payments.
 - React Toastify
 - Recharts
 - QR Code Generator
-
+- Motion
+- Tailwind Animations
 ---
 
 # 📂 Project Structure
 
+
+```js
 src
 │
 ├── admin
@@ -72,7 +75,7 @@ src
 └── utils
 ├── constants.js
 └── toast.js
-
+```
 ---
 
 # 🔐 Authentication Features
@@ -123,6 +126,7 @@ git clone https://github.com/kuldeep525-bot/student_mgt/
 The frontend can be deployed on:
 
 - Vercel
+- Render
 
 ---
 
@@ -132,6 +136,7 @@ The frontend can be deployed on:
 - Advanced Search & Filters
 - Real-time notifications
 - Performance optimization
+  
 
 ---
 
@@ -140,4 +145,8 @@ The frontend can be deployed on:
 Kuldeep Kumar  
 Full Stack Developer (MERN)
 
+Rishabh Singh
+Full Stack Developer (MERN)
+
 GitHub: https://github.com/kuldeep525-bot/student_mgt/
+Github : https://github.com/kaizenrishi
